@@ -1,0 +1,209 @@
+{% func PageHome(ongoingAnimes, popularAnimes []StructureAnime) %}
+<!-- Slider -->
+<div class="module title1">
+    <h3 class="module-title">Popular Right Now</h3>
+</div>
+<section id="ukSlider" class="uk-slider-section">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="uk-slidenav-position" data-uk-slideshow="{animation: 'fade', autoplay:true, infinite: true}">
+                    <ul class="uk-slideshow">
+                        <li aria-hidden="false" class="uk-active" style="animation-duration: 500ms; width: 100%; height: auto;">
+                            <div class="uk-grid">
+                                {% for i:=0; i<4; i++ %}
+                                <div class="uk-width-medium-1-4 uk-text-center wow fadeInUpBig slider-text animated"
+                                     data-wow-delay="{%f float64(i)+0.35 %}s">
+                                    <img style="margin:auto; height:450px; width:315px; box-shadow: 10px 10px 5px #888888;" src="http://localhost:1234/assets/img/anime/{%s popularAnimes[i].MALID %}.jpg"
+                                         data-holder-rendered="true">
+                                    <div class="uk-badge sliderThumbBadge">{%s popularAnimes[i].AnimeShowName %}</div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </li>
+                        <li aria-hidden="false" style="animation-duration: 500ms; width: 100%; height: auto;">
+                            <div class="uk-grid">
+                                {% for i:=4; i<8; i++ %}
+                                <div class="uk-width-medium-1-4 uk-text-center wow fadeInUpBig slider-text animated"
+                                     data-wow-delay="{%f float64(i)+2.35 %}s">
+                                    <img style="margin:auto; height:450px; width:315px; box-shadow: 10px 10px 5px #888888;" src="http://localhost:1234/assets/img/anime/{%s popularAnimes[i].MALID %}.jpg"
+                                         data-holder-rendered="true">
+                                    <div class="uk-badge sliderThumbBadge">{%s popularAnimes[i].AnimeShowName %}</div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </li>
+                        <li aria-hidden="false" style="animation-duration: 500ms; width: 100%; height: auto;">
+                            <div class="uk-grid">
+                                {% for i:=8; i<12; i++ %}
+                                <div class="uk-width-medium-1-4 uk-text-center wow fadeInUpBig slider-text animated"
+                                     data-wow-delay="{%f float64(i)+4.35 %}s">
+                                    <img style="margin:auto; height:450px; width:315px; box-shadow: 10px 10px 5px #888888;" src="http://localhost:1234/assets/img/anime/{%s popularAnimes[i].MALID %}.jpg"
+                                         data-holder-rendered="true">
+                                    <div class="uk-badge sliderThumbBadge">{%s popularAnimes[i].AnimeShowName %}</div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </li>
+                    </ul>
+                    <a data-uk-slideshow-item="previous" class="uk-slidenav uk-slidenav-contrast uk-slidenav-previous" href="#"></a>
+                    <a data-uk-slideshow-item="next" class="uk-slidenav uk-slidenav-contrast uk-slidenav-next" href="#"></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- /Slider -->
+<!-- Today's Specials -->
+<section class="top-a">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12 col-md-12">
+                <div class="module title1">
+                    <h3 class="module-title">Latest Episodes</h3>
+                    <div class="module-content">
+                        <div class="uk-grid uk-grid-divider uk-text-center">
+                            <div data-uk-scrollspy="{cls:'uk-animation-fade', delay:600}" class="uk-width-medium-1-5 uk-scrollspy-init-inview uk-scrollspy-inview">
+                                <div class="animeTitle">Naruto Shippuden</div>
+                                <p><img class="uk-align-center latestEpisodesThumb" data-uk-tooltip="{pos:'right', animation:true, activeClass:'latestEpisodesTooltip'}" title="Naruto: Shippuuden is the continuation of the original animated TV series Naruto. The story revolves around an older and slightly more matured Uzumaki Naruto and his quest to save his friend Uchiha Sasuke from the grips of the snake-like Shinobi, Orochimaru. After 2 and a half years Naruto finally returns to his village of Konoha, and sets about putting his ambitions to work, though it will not be easy, as he has amassed a few (more dangerous) enemies, in the likes of the shinobi organization Akatsuki." src="http://cdn.myanimelist.net/images/anime/5/17407l.jpg" alt="Caesars Salad"></p>
+                                <div class="uk-badge uk-badge-danger latestEpisodesSubDubThumbBadge">Raw</div>
+                                <div class="uk-badge uk-badge-success latestEpisodesScoreThumbBadge">Score: 8.78</div>
+                            </div>
+                            <div data-uk-scrollspy="{cls:'uk-animation-fade', delay:300}" class="uk-width-medium-1-5 uk-scrollspy-init-inview uk-scrollspy-inview">
+                                <div class="animeTitle">Whatever</div>
+                                <p><img class="uk-align-center latestEpisodesThumb" src="http://cdn.myanimelist.net/images/anime/11/79410l.jpg" alt="Sushi"></p>
+                                <div class="uk-badge uk-badge-success latestEpisodesSubDubThumbBadge">Dubbed</div>
+                                <div class="uk-badge uk-badge-success latestEpisodesScoreThumbBadge">Score: 8.78</div>
+                            </div>
+                            <div data-uk-scrollspy="{cls:'uk-animation-fade', delay:600}" class="uk-width-medium-1-5 uk-scrollspy-init-inview uk-scrollspy-inview">
+                                <div class="animeTitle">Whatever</div>
+                                <p><img class="uk-align-center latestEpisodesThumb" src="http://cdn.myanimelist.net/images/anime/3/79414l.jpg" alt="Tiramisu"></p>
+                                <div class="uk-badge uk-badge-success latestEpisodesSubDubThumbBadge">Dubbed</div>
+                                <div class="uk-badge uk-badge-success latestEpisodesScoreThumbBadge">Score: 8.78</div>
+                            </div>
+                            <div data-uk-scrollspy="{cls:'uk-animation-fade', delay:600}" class="uk-width-medium-1-5 uk-scrollspy-init-inview uk-scrollspy-inview">
+                                <div class="animeTitle">Whatever</div>
+                                <p><img class="uk-align-center latestEpisodesThumb" src="http://cdn.myanimelist.net/images/anime/3/79913l.jpg" alt="Tiramisu"></p>
+                                <div class="uk-badge uk-badge-success latestEpisodesSubDubThumbBadge">Dubbed</div>
+                                <div class="uk-badge uk-badge-success latestEpisodesScoreThumbBadge">Score: 8.78</div>
+                            </div>
+                            <div data-uk-scrollspy="{cls:'uk-animation-fade', delay:600}" class="uk-width-medium-1-5 uk-scrollspy-init-inview uk-scrollspy-inview">
+                                <div class="animeTitle">Whatever</div>
+                                <p><img class="uk-align-center latestEpisodesThumb" src="http://cdn.myanimelist.net/images/anime/3/67177l.jpg" alt="Tiramisu"></p>
+                                <div class="uk-badge uk-badge-success latestEpisodesSubDubThumbBadge">Dubbed</div>
+                                <div class="uk-badge uk-badge-success latestEpisodesScoreThumbBadge">Score: 8.78</div>
+                            </div>
+                            <div data-uk-scrollspy="{cls:'uk-animation-fade', delay:600}" class="uk-width-medium-1-5 uk-scrollspy-init-inview uk-scrollspy-inview">
+                                <div class="animeTitle">Whatever</div>
+                                <p><img class="uk-align-center latestEpisodesThumb" src="http://cdn.myanimelist.net/images/anime/6/78466l.jpg" alt="Caesars Salad"></p>
+                                <div class="uk-badge uk-badge-success latestEpisodesSubDubThumbBadge">Subbed</div>
+                                <div class="uk-badge uk-badge-success latestEpisodesScoreThumbBadge">Score: 8.78</div>
+                            </div>
+                            <div data-uk-scrollspy="{cls:'uk-animation-fade', delay:300}" class="uk-width-medium-1-5 uk-scrollspy-init-inview uk-scrollspy-inview">
+                                <div class="animeTitle">Whatever</div>
+                                <p><img class="uk-align-center latestEpisodesThumb" src="http://cdn.myanimelist.net/images/anime/12/79556l.jpg" alt="Sushi"></p>
+                                <div class="uk-badge uk-badge-danger latestEpisodesSubDubThumbBadge">Raw</div>
+                                <div class="uk-badge uk-badge-success latestEpisodesScoreThumbBadge">Score: 8.78</div>
+                            </div>
+                            <div data-uk-scrollspy="{cls:'uk-animation-fade', delay:600}" class="uk-width-medium-1-5 uk-scrollspy-init-inview uk-scrollspy-inview">
+                                <div class="animeTitle">Whatever</div>
+                                <p><img class="uk-align-center latestEpisodesThumb" src="http://cdn.myanimelist.net/images/anime/4/79468l.jpg" alt="Tiramisu"></p>
+                                <div class="uk-badge uk-badge-success latestEpisodesSubDubThumbBadge">Subbed</div>
+                                <div class="uk-badge uk-badge-success latestEpisodesScoreThumbBadge">Score: 8.78</div>
+                            </div>
+                            <div data-uk-scrollspy="{cls:'uk-animation-fade', delay:600}" class="uk-width-medium-1-5 uk-scrollspy-init-inview uk-scrollspy-inview">
+                                <div class="animeTitle">Whatever</div>
+                                <p><img class="uk-align-center latestEpisodesThumb" src="http://cdn.myanimelist.net/images/anime/3/79414l.jpg" alt="Tiramisu"></p>
+                                <div class="uk-badge uk-badge-success latestEpisodesSubDubThumbBadge">Subbed</div>
+                                <div class="uk-badge uk-badge-success latestEpisodesScoreThumbBadge">Score: 8.78</div>
+                            </div>
+                            <div data-uk-scrollspy="{cls:'uk-animation-fade', delay:600}" class="uk-width-medium-1-5 uk-scrollspy-init-inview uk-scrollspy-inview">
+                                <div class="animeTitle">Whatever</div>
+                                <p><img class="uk-align-center latestEpisodesThumb" src="http://cdn.myanimelist.net/images/anime/3/79414l.jpg" alt="Tiramisu"></p>
+                                <div class="uk-badge uk-badge-success latestEpisodesSubDubThumbBadge">Subbed</div>
+                                <div class="uk-badge uk-badge-success latestEpisodesScoreThumbBadge">Score: 8.78</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <a href="/latest-episodes"><button class="uk-button uk-width-1-1" type="button">Load More</button></a>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- /Today's Specials -->
+<!-- Our Menu -->
+<section class="top-b">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12 col-md-12 top7">
+                <div class="module title1">
+                    <h3 class="module-title">On-Going Series</h3>
+                </div>
+                <div class="uk-grid uk-grid-divider uk-text-center">
+                    {% for _, val := range ongoingAnimes %}
+                    <div data-uk-scrollspy="{cls:'uk-animation-fade', delay:600}"
+                         class="uk-width-medium-1-5 uk-scrollspy-init-inview uk-scrollspy-inview uk-panel">
+                        <div class="uk-panel-badge uk-badge uk-badge-success gridScoreThumbBadge">Score: {%f val.Score %}</div>
+                        <p><img class="uk-align-center latestEpisodesThumb" data-uk-tooltip="{pos:'right', animation:true, activeClass:'latestEpisodesTooltip'}"
+                                title="
+                                {% if len(val.AnimeShowDescription) > 500 %}
+                                    {%s val.AnimeShowDescription[:500] %}...
+                                {% else %}
+                                    {%s val.AnimeShowDescription %}
+                                {% endif %}
+                                "
+                                 src="http://localhost:1234/assets/img/anime/{%s val.MALID %}.jpg" alt="{%s val.MALTitle %}">
+                        </p>
+                        <div class="uk-panel-title">{%s val.AnimeShowName %}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+                <a href="/ongoing-series"><button class="uk-button uk-width-1-1" type="button">Load More</button></a>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- /Our Menu -->
+<!-- Fun Facts -->
+<section id="parallax-section-2">
+    <div class="row">
+        <div class="col-sm-12 col-md-12" id="parallax2">
+            <div class="module title1">
+                <div class="module-content">
+                    <div class="uk-text-contrast uk-text-center uk-flex uk-flex-center uk-flex-middle parallax2" data-uk-parallax="{bg: -300}">
+                        <div class="container padding-70">
+                            <div style="" class="module title1">
+                                <h3 class="module-title">Animedom Statistics</h3>
+                            </div>
+                            <div class="uk-grid uk-grid-divider">
+                                <div class="uk-width-medium-1-5 uk-text-center">
+                                    <h6 class="merri38">4739</h6>
+                                    <h5>Anime Series</h5>
+                                </div>
+                                <div class="uk-width-medium-1-5 uk-text-center">
+                                    <h6 class="merri38">34 215</h6>
+                                    <h5>Anime Episodes</h5>
+                                </div>
+                                <div class="uk-width-medium-1-5 uk-text-center">
+                                    <h6 class="merri38">2728</h6>
+                                    <h5>Comments</h5>
+                                </div>
+                                <div class="uk-width-medium-1-5 uk-text-center">
+                                    <h6 class="merri38">1800+</h6>
+                                    <h5>Daily Views</h5>
+                                </div>
+                                <div class="uk-width-medium-1-5 uk-text-center">
+                                    <h6 class="merri38">9845</h6>
+                                    <h5>Idiots banned</h5>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- /Fun Facts -->
+{% endfunc %}

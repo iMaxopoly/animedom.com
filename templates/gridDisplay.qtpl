@@ -1,0 +1,40 @@
+{% func PageGridDisplay(title string, animelist []StructureAnime) %}
+<section class="top-b">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12 col-md-12 top7">
+                <div class="module title1">
+                    <h3 class="module-title">
+                        {%s title %}
+                    </h3>
+                </div>
+                <div class="uk-grid uk-grid-divider uk-text-center">
+                    {% for _, val := range animelist %}
+                    <div data-uk-scrollspy="{cls:'uk-animation-fade', delay:600}" class="uk-width-medium-1-5 uk-scrollspy-init-inview uk-scrollspy-inview uk-panel">
+                        <div class="uk-panel-badge uk-badge uk-badge-success gridScoreThumbBadge">Score: {%f val.Score %}</div>
+                        <p><img class="uk-align-center latestEpisodesThumb"
+                                data-uk-tooltip="{pos:'right', animation:true, activeClass:'latestEpisodesTooltip'}"
+                                title="
+                                {% if len(val.AnimeShowDescription) > 500 %}
+                                    {%s val.AnimeShowDescription[:500] %}...
+                                {% else %}
+                                    {%s val.AnimeShowDescription %}
+                                {% endif %}
+                                " src="http://localhost:1234/assets/img/anime/{%s val.MALID %}.jpg"
+                                alt="{%s val.MALTitle %}"></p>
+                        <div class="uk-panel-title">{%s val.AnimeShowName %}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+                <ul class="uk-pagination">
+                    <li><span> |< </span></li>
+                    <li><span> < </span></li>
+                    <li class="uk-active"><a href=""></a></li>
+                    <li><span> > </span></li>
+                    <li><span> >| </span></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+{% endfunc %}

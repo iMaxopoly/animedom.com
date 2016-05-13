@@ -1,0 +1,16 @@
+package: animedom.com
+import:
+- package: github.com/PuerkitoBio/goquery
+  subpackages:
+  - github.com\PuerkitoBio\goquery
+- package: github.com/dancannon/gorethink
+  subpackages:
+  - github.com\dancannon\gorethink
+- package: github.com/kataras/iris
+  subpackages:
+  - github.com\kataras\iris
+  - github.com\kataras\iris\middleware\logger
+  - github.com\kataras\iris\middleware\recovery
+- package: github.com/valyala/quicktemplate
+  subpackages:
+  - github.com\valyala\quicktemplate

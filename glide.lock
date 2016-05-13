@@ -1,0 +1,109 @@
+hash: 33ce2422c0a94c69d4fa4654d0a596987ae537ec13e6e0cbd7260954422cf81d
+updated: 2016-05-13T00:57:41.5907256+05:30
+imports:
+- name: github.com/andybalholm/cascadia
+  version: 3ad29d1ad1c4f2023e355603324348cf1f4b2d48
+  subpackages:
+  - github.com\andybalholm\cascadia
+- name: github.com/cenkalti/backoff
+  version: c29158af31815ccc31ca29c86c121bc39e00d3d8
+  subpackages:
+  - github.com\cenkalti\backoff
+- name: github.com/dancannon/gorethink
+  version: 3ba11fcac3f069e1c0508f5404d075a1d0c4dc76
+  subpackages:
+  - github.com\dancannon\gorethink
+- name: github.com/flosch/pongo2
+  version: 7f5515449ea9bbeb00256d9cbb654c556e7d0146
+  subpackages:
+  - github.com\flosch\pongo2
+- name: github.com/garyburd/redigo
+  version: 8873b2f1995f59d4bcdd2b0dc9858e2cb9bf0c13
+  subpackages:
+  - github.com\garyburd\redigo\redis
+  - github.com\garyburd\redigo\internal
+- name: github.com/golang/protobuf
+  version: 7cc19b78d562895b13596ddce7aafb59dd789318
+  subpackages:
+  - github.com\golang\protobuf\proto
+- name: github.com/hailocab/go-hostpool
+  version: e80d13ce29ede4452c43dea11e79b9bc8a15b478
+  subpackages:
+  - github.com\hailocab\go-hostpool
+- name: github.com/kataras/iris
+  version: e7c2becc573cfb5687ce2a13585bacdea2ab1e0c
+  subpackages:
+  - github.com\kataras\iris
+  - github.com\kataras\iris\middleware\logger
+  - github.com\kataras\iris\middleware\recovery
+  - github.com\kataras\iris\context
+  - github.com\kataras\iris\errors
+  - github.com\kataras\iris\logger
+  - github.com\kataras\iris\render
+  - github.com\kataras\iris\server
+  - github.com\kataras\iris\sessions
+  - github.com\kataras\iris\sessions\providers\memory
+  - github.com\kataras\iris\sessions\providers\redis
+  - github.com\kataras\iris\sessions\store
+  - github.com\kataras\iris\utils
+  - github.com\kataras\iris\sessions\providers\redis\service
+- name: github.com/klauspost/compress
+  version: 14eb9c4951195779ecfbec34431a976de7335b0a
+  subpackages:
+  - github.com\klauspost\compress\gzip
+  - github.com\klauspost\compress\flate
+  - github.com\klauspost\compress\zlib
+- name: github.com/klauspost/cpuid
+  version: 09cded8978dc9e80714c4d85b0322337b0a1e5e0
+  subpackages:
+  - github.com\klauspost\cpuid
+- name: github.com/klauspost/crc32
+  version: 19b0b332c9e4516a6370a0456e6182c3b5036720
+  subpackages:
+  - github.com\klauspost\crc32
+- name: github.com/monoculum/formam
+  version: 7ca41e6e1d0e6229b6d2101eb9903ca09cbe985f
+  subpackages:
+  - github.com\monoculum\formam
+- name: github.com/PuerkitoBio/goquery
+  version: 2e29ea41f0d13f4a303c75553f4eeadddc7a4c56
+  subpackages:
+  - github.com\PuerkitoBio\goquery
+- name: github.com/Sirupsen/logrus
+  version: cd7d1bbe41066b6c1f19780f895901052150a575
+  subpackages:
+  - github.com\Sirupsen\logrus
+- name: github.com/valyala/fasthttp
+  version: ecba84a7fe001c29e69a8c7550b40f1c684e0113
+  subpackages:
+  - github.com\valyala\fasthttp
+  - github.com\valyala\fasthttp\fasthttpadaptor
+- name: github.com/valyala/quicktemplate
+  version: ffbaa0cfb3ac1679aa4fc2a6b78e4b502b95f26f
+  subpackages:
+  - github.com\valyala\quicktemplate
+- name: golang.org/x/crypto
+  version: 1e61df8d9ea476e2e1504cd9a32b40280c7c6c7e
+  subpackages:
+  - golang.org\x\crypto\pbkdf2
+- name: golang.org/x/net
+  version: 96dbb961a39ddccf16860cdd355bfa639c497f23
+  subpackages:
+  - golang.org\x\net\html
+  - golang.org\x\net\html\atom
+  - golang.org\x\net\context
+- name: golang.org/x/sys
+  version: e82cb4d7dffc35bcec7bc8bf9e402377e0ecf3f4
+  subpackages:
+  - golang.org\x\sys\unix
+- name: gopkg.in/dancannon/gorethink.v2
+  version: 3ba11fcac3f069e1c0508f5404d075a1d0c4dc76
+  subpackages:
+  - gopkg.in\dancannon\gorethink.v2\encoding
+  - gopkg.in\dancannon\gorethink.v2\ql2
+  - gopkg.in\dancannon\gorethink.v2\types
+- name: gopkg.in/fatih/pool.v2
+  version: cba550ebf9bce999a02e963296d4bc7a486cb715
+  subpackages:
+  - gopkg.in\fatih\pool.v2
+devImports: []
