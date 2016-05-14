@@ -1,4 +1,4 @@
-{% func PageHome(ongoingAnimes, popularAnimes []StructureAnime) %}
+{% func PageHome(ongoingAnimes, popularAnimes, recentAnimes []StructureAnime) %}
 <!-- Slider -->
 <div class="module title1">
     <h3 class="module-title">Popular Right Now</h3>
@@ -63,66 +63,25 @@
                     <h3 class="module-title">Latest Episodes</h3>
                     <div class="module-content">
                         <div class="uk-grid uk-grid-divider uk-text-center">
-                            <div data-uk-scrollspy="{cls:'uk-animation-fade', delay:600}" class="uk-width-medium-1-5 uk-scrollspy-init-inview uk-scrollspy-inview">
-                                <div class="animeTitle">Naruto Shippuden</div>
-                                <p><img class="uk-align-center latestEpisodesThumb" data-uk-tooltip="{pos:'right', animation:true, activeClass:'latestEpisodesTooltip'}" title="Naruto: Shippuuden is the continuation of the original animated TV series Naruto. The story revolves around an older and slightly more matured Uzumaki Naruto and his quest to save his friend Uchiha Sasuke from the grips of the snake-like Shinobi, Orochimaru. After 2 and a half years Naruto finally returns to his village of Konoha, and sets about putting his ambitions to work, though it will not be easy, as he has amassed a few (more dangerous) enemies, in the likes of the shinobi organization Akatsuki." src="http://cdn.myanimelist.net/images/anime/5/17407l.jpg" alt="Caesars Salad"></p>
-                                <div class="uk-badge uk-badge-danger latestEpisodesSubDubThumbBadge">Raw</div>
-                                <div class="uk-badge uk-badge-success latestEpisodesScoreThumbBadge">Score: 8.78</div>
+                            {% for _, val := range recentAnimes %}
+                            <div data-uk-scrollspy="{cls:'uk-animation-fade', delay:600}"
+                                 class="uk-width-medium-1-5 uk-scrollspy-init-inview uk-scrollspy-inview uk-panel">
+                                <div class="uk-panel-badge uk-badge uk-badge-success gridSubThumbBadge">
+                                    {%s val.EpisodeList[len(val.EpisodeList)-1].Mirrors[0].SubDub %}
+                                </div>
+                                <p><img class="uk-align-center latestEpisodesThumb" data-uk-tooltip="{pos:'right', animation:true, activeClass:'latestEpisodesTooltip'}"
+                                        title="
+                                {% if len(val.AnimeShowDescription) > 500 %}
+                                    {%s val.AnimeShowDescription[:500] %}...
+                                {% else %}
+                                    {%s val.AnimeShowDescription %}
+                                {% endif %}
+                                "
+                                        src="http://localhost:1234/assets/img/anime/{%s val.MALID %}.jpg" alt="{%s val.MALTitle %}">
+                                </p>
+                                <div class="uk-panel-title">{%s val.AnimeShowName %}</div>
                             </div>
-                            <div data-uk-scrollspy="{cls:'uk-animation-fade', delay:300}" class="uk-width-medium-1-5 uk-scrollspy-init-inview uk-scrollspy-inview">
-                                <div class="animeTitle">Whatever</div>
-                                <p><img class="uk-align-center latestEpisodesThumb" src="http://cdn.myanimelist.net/images/anime/11/79410l.jpg" alt="Sushi"></p>
-                                <div class="uk-badge uk-badge-success latestEpisodesSubDubThumbBadge">Dubbed</div>
-                                <div class="uk-badge uk-badge-success latestEpisodesScoreThumbBadge">Score: 8.78</div>
-                            </div>
-                            <div data-uk-scrollspy="{cls:'uk-animation-fade', delay:600}" class="uk-width-medium-1-5 uk-scrollspy-init-inview uk-scrollspy-inview">
-                                <div class="animeTitle">Whatever</div>
-                                <p><img class="uk-align-center latestEpisodesThumb" src="http://cdn.myanimelist.net/images/anime/3/79414l.jpg" alt="Tiramisu"></p>
-                                <div class="uk-badge uk-badge-success latestEpisodesSubDubThumbBadge">Dubbed</div>
-                                <div class="uk-badge uk-badge-success latestEpisodesScoreThumbBadge">Score: 8.78</div>
-                            </div>
-                            <div data-uk-scrollspy="{cls:'uk-animation-fade', delay:600}" class="uk-width-medium-1-5 uk-scrollspy-init-inview uk-scrollspy-inview">
-                                <div class="animeTitle">Whatever</div>
-                                <p><img class="uk-align-center latestEpisodesThumb" src="http://cdn.myanimelist.net/images/anime/3/79913l.jpg" alt="Tiramisu"></p>
-                                <div class="uk-badge uk-badge-success latestEpisodesSubDubThumbBadge">Dubbed</div>
-                                <div class="uk-badge uk-badge-success latestEpisodesScoreThumbBadge">Score: 8.78</div>
-                            </div>
-                            <div data-uk-scrollspy="{cls:'uk-animation-fade', delay:600}" class="uk-width-medium-1-5 uk-scrollspy-init-inview uk-scrollspy-inview">
-                                <div class="animeTitle">Whatever</div>
-                                <p><img class="uk-align-center latestEpisodesThumb" src="http://cdn.myanimelist.net/images/anime/3/67177l.jpg" alt="Tiramisu"></p>
-                                <div class="uk-badge uk-badge-success latestEpisodesSubDubThumbBadge">Dubbed</div>
-                                <div class="uk-badge uk-badge-success latestEpisodesScoreThumbBadge">Score: 8.78</div>
-                            </div>
-                            <div data-uk-scrollspy="{cls:'uk-animation-fade', delay:600}" class="uk-width-medium-1-5 uk-scrollspy-init-inview uk-scrollspy-inview">
-                                <div class="animeTitle">Whatever</div>
-                                <p><img class="uk-align-center latestEpisodesThumb" src="http://cdn.myanimelist.net/images/anime/6/78466l.jpg" alt="Caesars Salad"></p>
-                                <div class="uk-badge uk-badge-success latestEpisodesSubDubThumbBadge">Subbed</div>
-                                <div class="uk-badge uk-badge-success latestEpisodesScoreThumbBadge">Score: 8.78</div>
-                            </div>
-                            <div data-uk-scrollspy="{cls:'uk-animation-fade', delay:300}" class="uk-width-medium-1-5 uk-scrollspy-init-inview uk-scrollspy-inview">
-                                <div class="animeTitle">Whatever</div>
-                                <p><img class="uk-align-center latestEpisodesThumb" src="http://cdn.myanimelist.net/images/anime/12/79556l.jpg" alt="Sushi"></p>
-                                <div class="uk-badge uk-badge-danger latestEpisodesSubDubThumbBadge">Raw</div>
-                                <div class="uk-badge uk-badge-success latestEpisodesScoreThumbBadge">Score: 8.78</div>
-                            </div>
-                            <div data-uk-scrollspy="{cls:'uk-animation-fade', delay:600}" class="uk-width-medium-1-5 uk-scrollspy-init-inview uk-scrollspy-inview">
-                                <div class="animeTitle">Whatever</div>
-                                <p><img class="uk-align-center latestEpisodesThumb" src="http://cdn.myanimelist.net/images/anime/4/79468l.jpg" alt="Tiramisu"></p>
-                                <div class="uk-badge uk-badge-success latestEpisodesSubDubThumbBadge">Subbed</div>
-                                <div class="uk-badge uk-badge-success latestEpisodesScoreThumbBadge">Score: 8.78</div>
-                            </div>
-                            <div data-uk-scrollspy="{cls:'uk-animation-fade', delay:600}" class="uk-width-medium-1-5 uk-scrollspy-init-inview uk-scrollspy-inview">
-                                <div class="animeTitle">Whatever</div>
-                                <p><img class="uk-align-center latestEpisodesThumb" src="http://cdn.myanimelist.net/images/anime/3/79414l.jpg" alt="Tiramisu"></p>
-                                <div class="uk-badge uk-badge-success latestEpisodesSubDubThumbBadge">Subbed</div>
-                                <div class="uk-badge uk-badge-success latestEpisodesScoreThumbBadge">Score: 8.78</div>
-                            </div>
-                            <div data-uk-scrollspy="{cls:'uk-animation-fade', delay:600}" class="uk-width-medium-1-5 uk-scrollspy-init-inview uk-scrollspy-inview">
-                                <div class="animeTitle">Whatever</div>
-                                <p><img class="uk-align-center latestEpisodesThumb" src="http://cdn.myanimelist.net/images/anime/3/79414l.jpg" alt="Tiramisu"></p>
-                                <div class="uk-badge uk-badge-success latestEpisodesSubDubThumbBadge">Subbed</div>
-                                <div class="uk-badge uk-badge-success latestEpisodesScoreThumbBadge">Score: 8.78</div>
-                            </div>
+                            {% endfor %}
                         </div>
                     </div>
                 </div>

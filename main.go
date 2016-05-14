@@ -2,8 +2,8 @@ package main
 
 import (
 	"os"
-	"fmt"
-	"time"
+	//"time"
+	"log"
 
 	// 3rd Party libraries
 	"github.com/kataras/iris"
@@ -13,8 +13,6 @@ import (
 
 func main() {
 	/* Declare and Initialize Middlewares */
-	malMonitorRecentEpisodes()
-	return
 	animedom := iris.New()
 	animedom.UseFunc(logger.Default())
 	animedom.Use(recovery.New(os.Stderr))
@@ -74,14 +72,24 @@ func main() {
 
 	/* Run the goroutines */
 	// Running Popular anime check every 24 hours
-	go func() {
-		for {
-			malMonitorPopularAnimes()
-			time.Sleep(24 * time.Hour)
-		}
-	}()
+	log.Println("Running tasks please wait...")
+	//malMonitorPopularAnimes()
+	//go func() {
+	//	for {
+	//		time.Sleep(24 * time.Hour)
+	//		malMonitorPopularAnimes()
+	//	}
+	//}()
+	//// Running Recent episodes/anime check every 5 minutes
+	//malMonitorRecentEpisodes()
+	//go func(){
+	//	for {
+	//		time.Sleep(5 * time.Minute)
+	//		malMonitorRecentEpisodes()
+	//	}
+	//}()
 
 	/* Launch the server */
-	fmt.Println("Server is running at :1234")
+	log.Println("Server is running at :1234")
 	animedom.Listen(":1234")
 }

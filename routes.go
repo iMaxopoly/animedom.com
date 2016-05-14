@@ -3,10 +3,9 @@ package main
 import (
 	"animedom.com/templates"
 	"strconv"
+	"log"
 
 	"github.com/kataras/iris"
-	"fmt"
-	"log"
 )
 
 func routeIndex(c *iris.Context) {
@@ -23,11 +22,20 @@ func routeIndex(c *iris.Context) {
 		c.WriteHTML(200, "Nothing more to show.")
 		return
 	}
+
+	recentEpisodes, err := dbFetchXRecentAnime(0, 20)
+	if err != nil {
+		log.Println(err)
+		c.WriteHTML(200, "Nothing more to show.")
+		return
+	}
+
 	c.Response.Header.SetContentType("text/html; charset=utf-8")
 	templates.WritePageLayout(c.Response.BodyWriter(), templates.Page{
 		Selection:"Home",
 		OngoingAnimes:ongoingAnimes,
 		PopularAnimes:popularAnimes,
+		RecentAnimes: recentEpisodes,
 	})
 }
 
@@ -93,7 +101,7 @@ func routeTopRating(c *iris.Context) {
 			c.WriteHTML(200, "Nothing more to show.")
 			return
 		}
-		fmt.Println(err.Error())
+		log.Println(err.Error())
 		c.WriteHTML(500, "Sorry we countered an error.")
 		return
 	}

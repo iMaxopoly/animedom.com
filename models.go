@@ -2,10 +2,6 @@ package main
 
 import "encoding/xml"
 
-type StructurePopularAnimes struct {
-	MALID string  `json:"MAL ID" storm:"id" gorethink:"id"`
-}
-
 /* myanimelist.net models */
 type structureMALApiAnime struct {
 	Anime   xml.Name               `xml:"anime"`
@@ -36,17 +32,6 @@ type structureAnimeshowEpisodelist struct {
 	Altname     string
 	Description string
 	Episodes    []string
-}
-
-type structureEpisode struct {
-	Name    string            `json:"Episode Name" storm:"index" gorethink:"Name"`
-	Mirrors []structureMirror `json:"Episode Mirrors" storm:"index" gorethink:"Mirrors"`
-}
-
-type structureMirror struct {
-	Name   string `json:"Mirror Name" storm:"index" gorethink:"Name"`
-	Iframe string `json:"Embed Code" storm:"index" gorethink:"Iframe"`
-	SubDub string `json:"SubDub" storm:"index" gorethink:"SubDub"`
 }
 
 type structureMirrorToExtract struct {

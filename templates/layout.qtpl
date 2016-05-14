@@ -6,6 +6,7 @@ type Page struct {
     GridAnimes    []StructureAnime
     OngoingAnimes []StructureAnime
     PopularAnimes []StructureAnime
+    RecentAnimes  []StructureAnime
 }
 
 type StructureAnime struct {
@@ -383,7 +384,7 @@ type StructureMirror struct {
     </div>
     <!-- /Sticky Menu -->
     {% if p.Selection == "Home" %}
-        {%= PageHome(p.OngoingAnimes, p.PopularAnimes) %}
+        {%= PageHome(p.OngoingAnimes, p.PopularAnimes, p.RecentAnimes) %}
     {% elseif p.Selection == "GridDisplay" %}
         {%= PageGridDisplay(p.Title, p.GridAnimes) %}
     {% elseif p.Selection == "WatchVideo" %}
