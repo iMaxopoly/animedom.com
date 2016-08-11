@@ -1,0 +1,102 @@
+{% import "strings" %}
+{% import "animedom.com/projectModels" %}
+{% import "animedom.com/common" %}
+{% func PageAnimeDetail(anime projectModels.StructureAnime, base string) %}
+{%code
+    hashTags := getAnimeHashTags(anime)
+%}
+{% collapsespace %}
+{% stripspace %}
+<section class="top-b">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12 col-md-12 top7" id="title">
+                <div class="module title1">
+                    <h1 class="module-title">
+                        {%s anime.MALTitle %}
+                        {% if anime.MALEnglish != ""  && anime.MALEnglish != anime.MALTitle %}
+                            {%s "("+ anime.MALEnglish +")" %}
+                        {% endif %}
+                    </h1>
+                </div>
+                <div style="text-align:center;">
+                    <script id="1l1uekj1g1xbsp" data-cfasync="false">
+                        (window._1l1uekj||(window._1l1uekj=[])).push({"id":"1g1xbsp","sid":"1l1uekj","v":2});
+                    </script>
+                </div>
+                <br>
+                <div class="col-sm-4 col-md-4">
+                    <img class="animePageThumb" src="{%s base %}/assets/img/anime/{%s anime.MALID %}.jpg" alt="{%s anime.MALTitle %}">
+                </div>
+                <div class="col-sm-8 col-md-8" style="text-align: left;">
+                    {% if !strings.Contains(anime.Trailer, "void") && !strings.Contains(anime.Trailer, "Nil") %}
+                        <a href="https://www.youtube.com/watch?v={%s anime.Trailer %}" data-uk-lightbox="" title="" class="uk-button uk-button-mini">Watch Trailer</a>
+                    {% endif %}
+                    <a class="uk-button uk-button-mini" href="{%s base %}/watch/{%s anime.MALID %}/{%s common.GetMirrorHash("sub", anime, 0, 0) %}/0/m/0" role="button">Watch Anime</a>
+                    <br><br>
+                    <span class="animePageMetaTitle">Score:</span>&nbsp;{%f anime.Score %}&nbsp;|&nbsp;Visit&nbsp;<a href="http://myanimelist.net/anime/{%s anime.MALID%}" target="_blank"><strong style="color:#394DA0;">MyAnimeList</strong></a>
+                    <br>
+                    <span class="animePageMetaTitle">Type:</span>&nbsp;{%s anime.Type %}
+                    <br>
+                    <span class="animePageMetaTitle">Year:</span>&nbsp;{%v anime.Year %}
+                    <br>
+                    <span class="animePageMetaTitle">Status:</span>&nbsp;{%s anime.Status %}
+                    <br>
+                    <span class="animePageMetaTitle">Genres:</span>&nbsp;
+                    {% for i, v:= range anime.Genre %}
+                        {% if i == len(anime.Genre)-1 %}
+                            {%s v %}
+                        {% else %}
+                            {%s v+", " %}
+                        {% endif %}
+                    {% endfor %}
+                    <br><br>
+                    <span class="animePageMetaTitle">Summary:</span>&nbsp;
+                    {%s= strings.Replace(anime.MALDescription, "summary", "", 1) %}
+                    <br><br>
+                    <div class="animePageMetaTitle text-center"><u>Episode List</u></div>
+                    {%= partialEpisodeList(anime) %}
+                </div>
+            </div>
+        </div>
+        <div class="row uk-text-center">
+            {% if len(hashTags)>0 %}
+                {% for i:=0; i<len(hashTags); i++ %}
+                    <span class="uk-badge uk-badge-urban" style="background: rgba(212, 212, 212, 0.13)">#{%s hashTags[i] %}</span>
+                {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+</section>
+<!-- /Page Title -->
+<section class="bottom">
+    <div class="container">
+        <div class="row">
+            <script id="1l1uekj1gb8lum" data-cfasync="false">
+                (window._1l1uekj||(window._1l1uekj=[])).push({"id":"1gb8lum","sid":"1l1uekj","v":2});
+            </script>
+            <div id="disqus_thread"></div>
+            <script>
+                 var disqus_config = function () {
+                 this.page.url = "{%s base %}/wiki/{%s anime.MALID %}/{%s anime.WikiHash %}";
+                 this.page.identifier = "wiki-{%s anime.MALTitle %}";
+                 };
+
+                (function () {
+                    var d = document,
+                            s = d.createElement('script');
+
+                    s.src = '//animedom.disqus.com/embed.js';
+
+                    s.setAttribute('data-timestamp', +new Date());
+                    (d.head || d.body).appendChild(s);
+                })();
+            </script>
+            <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments
+                powered by Disqus.</a></noscript>
+        </div>
+    </div>
+</section>
+{% endstripspace %}
+{% endcollapsespace %}
+{% endfunc %}

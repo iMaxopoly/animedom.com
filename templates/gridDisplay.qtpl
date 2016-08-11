@@ -1,40 +1,256 @@
-{% func PageGridDisplay(title string, animelist []StructureAnime) %}
+{% import "math" %}
+{% import "strings" %}
+{% import "animedom.com/common" %}
+{% import "animedom.com/projectModels" %}
+{% func PageGridDisplay(title string, resultCount int, currentPageNum int, animelist []projectModels.StructureAnime, episodeListHelper []projectModels.StructureRecentAnimesDbHelper, base string) %}
+{%code
+    var genres []string
+    if strings.Contains(title, "Genre Search Result") {
+        spartan := strings.Split(title, ";")
+        title = spartan[0]
+        genres = strings.Split(spartan[1], ",")
+    }
+
+    imgCDNUrl := getImgCDN(base)
+%}
+{% collapsespace %}
+{% stripspace %}
 <section class="top-b">
     <div class="container">
         <div class="row">
             <div class="col-sm-12 col-md-12 top7">
                 <div class="module title1">
-                    <h3 class="module-title">
+                    <h3 class="module-title titleHeading">
                         {%s title %}
+                        {% if title == "Genre Search Result" %}
+                            {%s " " %}-{%s " " %}
+                            {% if len(genres) == 1 %}
+                                {%s genres[0] %}
+                            {% else %}
+                                {% for i, v := range genres %}
+                                    {% if i == len(genres)-1 %}
+                                        {%s " "+v %}
+                                    {% else %}
+                                        {%s v %},
+                                    {% endif %}
+                                {% endfor %}
+                            {% endif %}
+                        {% endif %}
                     </h3>
                 </div>
+                <div style="text-align:center;">
+                    <script id="1l1uekj1c8grel" data-cfasync="false">
+                        (window._1l1uekj||(window._1l1uekj=[])).push({"id":"1c8grel","sid":"1l1uekj","v":2});
+                    </script>
+                </div>
+                <br>
                 <div class="uk-grid uk-grid-divider uk-text-center">
-                    {% for _, val := range animelist %}
-                    <div data-uk-scrollspy="{cls:'uk-animation-fade', delay:600}" class="uk-width-medium-1-5 uk-scrollspy-init-inview uk-scrollspy-inview uk-panel">
-                        <div class="uk-panel-badge uk-badge uk-badge-success gridScoreThumbBadge">Score: {%f val.Score %}</div>
-                        <p><img class="uk-align-center latestEpisodesThumb"
-                                data-uk-tooltip="{pos:'right', animation:true, activeClass:'latestEpisodesTooltip'}"
-                                title="
-                                {% if len(val.AnimeShowDescription) > 500 %}
-                                    {%s val.AnimeShowDescription[:500] %}...
-                                {% else %}
-                                    {%s val.AnimeShowDescription %}
-                                {% endif %}
-                                " src="http://localhost:1234/assets/img/anime/{%s val.MALID %}.jpg"
-                                alt="{%s val.MALTitle %}"></p>
-                        <div class="uk-panel-title">{%s val.AnimeShowName %}</div>
-                    </div>
+                    {% for i, val := range animelist %}
+                    {% if title == "Latest Episodes" %}
+                        <div data-uk-scrollspy="{cls:'uk-animation-fade', delay:300}" class="uk-width-small-1-3 uk-width-medium-1-4 uk-width-large-1-5 uk-scrollspy-init-inview uk-scrollspy-inview uk-panel" style="padding-bottom: 20px">
+                            <figure class="uk-overlay uk-overlay-hover latestEpisodesThumbFigure">
+                                <img class="uk-align-center latestEpisodesThumb" src="{%s imgCDNUrl %}/assets/img/smallanime/{%s val.MALID %}.jpg" alt="{%s val.MALTitle %}">
+                                <div class="uk-panel-badge uk-badge uk-badge-success
+                                    {% if len(val.SubbedEpisodeList) > 0 %}
+                                        {%s " gridSubThumbBadge" %}
+                                    {% elseif len(val.EnglishDubbedEpisodeList) > 0 %}
+                                        {%s " gridDubThumbBadge" %}
+                                    {% endif %}
+                                ">
+                                test
+                                </div>
+                                <div class="uk-panel-badge uk-badge uk-badge-success gridEpisodeThumbBadge" style="background: #4080ff; color: #FFFFFF;">
+                                    {% if val.Type == "TV" %}
+                                        {%s "Ep. "%}{%s val.SubbedEpisodeList[episodeListHelper[i].EpisodeIndex].EpisodeID %}
+                                    {% else %}
+                                        {%s val.Type + " " %}{%s val.SubbedEpisodeList[episodeListHelper[i].EpisodeIndex].EpisodeID %}
+                                    {% endif %}
+                                </div>
+                                <div class="uk-overlay-panel uk-overlay-fade uk-overlay-background">
+                                    <button class="uk-button uk-button-mini animeThumbWatchButton" type="button">
+                                        Watch Anime
+                                    </button>
+                                    <div>
+                                        {% if len(val.MALDescription) > 200 %}
+                                            {%s cleanMALDescription(val.MALDescription[:200]) %}...
+                                        {% else %}
+                                            {%s cleanMALDescription(val.MALDescription) %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                    {%code
+                    mHash := common.GetMirrorHash("sub", val, episodeListHelper[i].EpisodeIndex, 0)
+                    %}
+                                <a class="uk-position-cover" href="{%s base %}/watch/{%s val.MALID %}/{%s mHash %}/{%d episodeListHelper[i].EpisodeIndex %}/m/0"></a>
+                            </figure>
+                            <div class="uk-panel-title">
+                                <a style="color:#444444;" href="{%s base %}/watch/{%s val.MALID %}/{%s mHash %}/{%d episodeListHelper[i].EpisodeIndex %}/m/0">
+                                    {% if val.MALEnglish == "" %}
+                                        {%s val.MALTitle %}
+                                    {% else %}
+                                        {%s val.MALEnglish %}
+                                    {% endif %}
+                                </a>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div data-uk-scrollspy="{cls:'uk-animation-fade', delay:300}" class="uk-width-small-1-3 uk-width-medium-1-4 uk-width-large-1-5 uk-scrollspy-init-inview uk-scrollspy-inview uk-panel" style="padding-bottom: 20px">
+                            <figure class="uk-overlay uk-overlay-hover latestEpisodesThumbFigure">
+                                <img class="uk-align-center latestEpisodesThumb" src="{%s imgCDNUrl %}/assets/img/smallanime/{%s val.MALID %}.jpg" alt="{%s val.MALTitle %}">
+                                <div class="uk-panel-badge uk-badge uk-badge-success gridScoreThumbBadge">Score:&nbsp;{%f val.Score %}</div>
+                                <div class="uk-overlay-panel uk-overlay-fade uk-overlay-background">
+                                    <button class="uk-button uk-button-mini animeThumbWatchButton" type="button">
+                                        Watch Anime
+                                    </button>
+                                    <div>
+                                        {% if len(val.MALDescription) > 200 %}
+                                            {%s cleanMALDescription(val.MALDescription[:200]) %}...
+                                        {% else %}
+                                            {%s cleanMALDescription(val.MALDescription) %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <a class="uk-position-cover" href="{%s base %}/wiki/{%s val.MALID %}/{%s val.WikiHash %}"></a>
+                            </figure>
+                            <div class="uk-panel-title">
+                                <a style="color:#444444;" href="{%s base %}/wiki/{%s val.MALID %}/{%s val.WikiHash %}">
+                                    {% if val.MALEnglish == "" %}
+                                        {%s val.MALTitle %}
+                                    {% else %}
+                                        {%s val.MALEnglish %}
+                                    {% endif %}
+                                </a>
+                            </div>
+                        </div>
+                    {% endif %}
                     {% endfor %}
                 </div>
+                {%code
+                    urlHelper := ""
+                    if title == "Latest Episodes" {
+                        urlHelper = "latest-episodes"
+                    } else if title == "Ongoing Series"{
+                        urlHelper = "ongoing-series"
+                    } else if title == "Top Rating" {
+                        urlHelper = "top-rating"
+                    } else if title == "Genre Search Result" {
+                        urlHelper = "genre/filter"
+                    } else if title == "Movies" {
+                        urlHelper = "movies"
+                    } else if title == "Action Mood" {
+                        urlHelper = "action-anime"
+                    } else if title == "Ecchi Mood" {
+                        urlHelper = "ecchi-anime"
+                    } else if title == "TearJerker Mood" {
+                        urlHelper = "emotional-anime"
+                    } else if title == "Thriller Mood" {
+                        urlHelper = "thriller-anime"
+                    } else if title == "InspireMe Mood" {
+                        urlHelper = "inspiring-anime"
+                    } else if title == "Classic Animes" {
+                        urlHelper = "classic-anime"
+                    } else if title == "Popular Series this Season" {
+                        urlHelper = "popular-anime"
+                    }
+                %}
+                {%code
+                    var previousPage bool
+                    var nextPage bool
+
+                    totalPagesNecessary := int(math.Ceil(float64(resultCount)/float64(30)))
+
+                    if currentPageNum == 1 {
+                        previousPage = false
+                    } else {
+                        previousPage = true
+                    }
+
+                    if (currentPageNum + 1) <= totalPagesNecessary {
+                        nextPage = true
+                    }
+                %}
+                <br>
+                <br>
+                <div style="text-align:center;">
+                    <script id="1l1uekj1aaj95u" data-cfasync="false">
+                        (window._1l1uekj||(window._1l1uekj=[])).push({"id":"1aaj95u","sid":"1l1uekj","v":2});
+                    </script>
+                </div>
+                <br>
+                {% if title != "Action Mood" && title != "Ecchi Mood" && title != "TearJerker Mood" && title != "Thriller Mood" && title != "InspireMe Mood" && title != "Classic Animes" %}
                 <ul class="uk-pagination">
-                    <li><span> |< </span></li>
-                    <li><span> < </span></li>
-                    <li class="uk-active"><a href=""></a></li>
-                    <li><span> > </span></li>
-                    <li><span> >| </span></li>
+                    {% if urlHelper == "genre/filter" %}
+                        {% if previousPage == true %}
+                        <li>
+                            <form action="{%s base %}/{%s urlHelper %}/1" method="post">
+                                {% for _, v := range genres %}
+                                <input type="hidden" name="genre" value="{%s v %}">
+                                {% endfor %}
+                                <span class="animeGridPageGenrePaginatedButtons"> <a onclick="$(this).closest('form').submit()">First</a> </span>
+                            </form>
+                        </li>
+                        <li><form action="{%s base %}/{%s urlHelper %}/{%d currentPageNum-1 %}" method="post">
+                            {% for _, v := range genres %}
+                            <input type="hidden" name="genre" value="{%s v %}">
+                            {% endfor %}
+                            <span class="animeGridPageGenrePaginatedButtons"> <a onclick="$(this).closest('form').submit()">Previous</a> </span>
+                        </form></li>
+                        {% endif %}s
+
+                        <li class="uk-active">{%d currentPageNum %}</li>
+
+                        {% if nextPage == true %}
+                        <li><form action="{%s base %}/{%s urlHelper %}/{%d currentPageNum+1 %}" method="post">
+                            {% for _, v := range genres %}
+                            <input type="hidden" name="genre" value="{%s v %}">
+                            {% endfor %}
+                            <span class="animeGridPageGenrePaginatedButtons"> <a onclick="$(this).closest('form').submit()">Next</a> </span>
+                        </form></li>
+                        <li><form action="{%s base %}/{%s urlHelper %}/{%d totalPagesNecessary %}" method="post">
+                            {% for _, v := range genres %}
+                            <input type="hidden" name="genre" value="{%s v %}">
+                            {% endfor %}
+                            <span class="animeGridPageGenrePaginatedButtons"> <a onclick="$(this).closest('form').submit()">Last</a> </span>
+                        </form></li>
+                        {% endif %}
+                    {% elseif strings.Contains(title,"Search result for") %}
+                        {%code
+                        searchTerm := strings.TrimPrefix(title, "Search result for ")
+                        searchTerm = searchTerm[1:len(searchTerm)-1]
+                        %}
+
+                        {% if previousPage == true %}
+                            <li><span> <a href="/search?term={%s searchTerm %}&page=1">First Page</a> </span></li>
+                            <li><span> <a href="/search?term={%s searchTerm %}&page={%d currentPageNum-1 %}">Previous</a> </span></li>
+                        {% endif %}
+
+                        <li class="uk-active">{%d currentPageNum %}</li>
+
+                        {% if nextPage == true %}
+                            <li><span> <a href="/search?term={%s searchTerm %}&page={%d currentPageNum+1 %}">Next</a> </span></li>
+                            <li><span> <a href="/search?term={%s searchTerm %}&page={%d totalPagesNecessary %}">Last Page</a> </span></li>
+                        {% endif %}
+                    {% else %}
+                        {% if previousPage == true %}
+                            <li><span> <a href="/{%s urlHelper %}/1">First Page</a> </span></li>
+                            <li><span> <a href="/{%s urlHelper %}/{%d currentPageNum-1 %}">Previous</a> </span></li>
+                        {% endif %}
+
+                            <li class="uk-active">{%d currentPageNum %}</li>
+
+                        {% if nextPage == true %}
+                            <li><span> <a href="/{%s urlHelper %}/{%d currentPageNum+1 %}">Next</a> </span></li>
+                            <li><span> <a href="/{%s urlHelper %}/{%d totalPagesNecessary %}">Last Page</a> </span></li>
+                        {% endif %}
+                    {% endif %}
                 </ul>
+                {% else %}
+                    <a href="/{%s urlHelper %}" class="uk-button uk-width-1-1" role="button">Reload</a>
+                {% endif %}
             </div>
         </div>
     </div>
 </section>
 {% endfunc %}
+{% endstripspace %}
+{% endcollapsespace %}

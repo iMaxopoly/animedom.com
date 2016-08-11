@@ -1,130 +1,280 @@
-{% func PageHome(ongoingAnimes, popularAnimes, recentAnimes []StructureAnime) %}
+{% collapsespace %}
+{% stripspace %}
+{% import "strings" %}
+{% import "animedom.com/common" %}
+{% import "animedom.com/projectModels" %}
+{% import "github.com/kennygrant/sanitize" %}
+{%code
+func cleanMALDescription(s string) string {
+    s = strings.Replace(s, "[i]", "", -1)
+    s = strings.Replace(s, "[/i]", "", -1)
+    return sanitize.HTML(s)
+}
+%}
+{% func PageHome(ongoingAnimes, popularAnimes, recentAnimes, featuredAnimes []projectModels.StructureAnime, episodeListHelper []projectModels.StructureRecentAnimesDbHelper, blogs []projectModels.StructureBlog, base string) %}
+{%code
+    imgCDNUrl := base
+    if imgCDNUrl != "http://localhost:1993" {
+        if imgCDNUrl[0:5] == "https"{
+            imgCDNUrl = imgCDNUrl[0:5]+"://cdn."+imgCDNUrl[8:]
+        } else {
+            imgCDNUrl = imgCDNUrl[0:4]+"://cdn."+imgCDNUrl[7:]
+        }
+    }
+%}
 <!-- Slider -->
 <div class="module title1">
-    <h3 class="module-title">Popular Right Now</h3>
+    <h3 class="module-title titleHeading">What's New This Season?</h3>
 </div>
 <section id="ukSlider" class="uk-slider-section">
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-12">
-                <div class="uk-slidenav-position" data-uk-slideshow="{animation: 'fade', autoplay:true, infinite: true}">
-                    <ul class="uk-slideshow">
-                        <li aria-hidden="false" class="uk-active" style="animation-duration: 500ms; width: 100%; height: auto;">
-                            <div class="uk-grid">
-                                {% for i:=0; i<4; i++ %}
-                                <div class="uk-width-medium-1-4 uk-text-center wow fadeInUpBig slider-text animated"
-                                     data-wow-delay="{%f float64(i)+0.35 %}s">
-                                    <img style="margin:auto; height:450px; width:315px; box-shadow: 10px 10px 5px #888888;" src="http://localhost:1234/assets/img/anime/{%s popularAnimes[i].MALID %}.jpg"
-                                         data-holder-rendered="true">
-                                    <div class="uk-badge sliderThumbBadge">{%s popularAnimes[i].AnimeShowName %}</div>
+                <div class="uk-slidenav-position" data-uk-slider="{infinite: true, autoplay: true, autoplayInterval: 2000}">
+
+                    <div class="uk-slider-container">
+                        <ul class="uk-slider uk-grid-width-medium-1-3 uk-grid-width-large-1-4">
+                            {% for i:=0; i<len(popularAnimes); i++ %}
+                            <li>
+                                <div class="uk-grid-medium uk-text-center wow fadeInUpBig slider-text animated" data-wow-delay="{%f float64(i)+1.35 %}s">
+                                    <figure class="uk-overlay uk-overlay-hover">
+                                        <img class="homeSliderImg" src="{%s imgCDNUrl %}/assets/img/anime/{%s popularAnimes[i].MALID %}.jpg" data-holder-rendered="true" alt="{%s popularAnimes[i].MALTitle %}">
+                                        <div class="uk-overlay-panel uk-overlay-fade uk-overlay-background animeSliderThumbHoverAdjust">
+                                            <button class="uk-button uk-button-mini animeMegaThumbWatchButton" type="button">
+                                                Watch Anime
+                                            </button>
+                                            <div class="animeMegaThumbTitle">
+                                                {% if popularAnimes[i].MALEnglish == "" || popularAnimes[i].MALEnglish ==  popularAnimes[i].MALTitle %}
+                                                    {%s popularAnimes[i].MALTitle %}
+                                                {% else %}
+                                                    {%s popularAnimes[i].MALEnglish %}
+                                                {% endif %}
+                                            </div>
+                                            <div class="animeMegaThumbDescription">
+                                                {% if len(popularAnimes[i].MALDescription) > 500 %}
+                                                {%s cleanMALDescription(popularAnimes[i].MALDescription[:500]) %}...
+                                                {% else %}
+                                                {%s cleanMALDescription(popularAnimes[i].MALDescription) %}
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                        <a class="uk-position-cover" href="{%s base %}/wiki/{%s popularAnimes[i].MALID %}/{%s popularAnimes[i].WikiHash %}"></a>
+                                    </figure>
                                 </div>
-                                {% endfor %}
-                            </div>
-                        </li>
-                        <li aria-hidden="false" style="animation-duration: 500ms; width: 100%; height: auto;">
-                            <div class="uk-grid">
-                                {% for i:=4; i<8; i++ %}
-                                <div class="uk-width-medium-1-4 uk-text-center wow fadeInUpBig slider-text animated"
-                                     data-wow-delay="{%f float64(i)+2.35 %}s">
-                                    <img style="margin:auto; height:450px; width:315px; box-shadow: 10px 10px 5px #888888;" src="http://localhost:1234/assets/img/anime/{%s popularAnimes[i].MALID %}.jpg"
-                                         data-holder-rendered="true">
-                                    <div class="uk-badge sliderThumbBadge">{%s popularAnimes[i].AnimeShowName %}</div>
-                                </div>
-                                {% endfor %}
-                            </div>
-                        </li>
-                        <li aria-hidden="false" style="animation-duration: 500ms; width: 100%; height: auto;">
-                            <div class="uk-grid">
-                                {% for i:=8; i<12; i++ %}
-                                <div class="uk-width-medium-1-4 uk-text-center wow fadeInUpBig slider-text animated"
-                                     data-wow-delay="{%f float64(i)+4.35 %}s">
-                                    <img style="margin:auto; height:450px; width:315px; box-shadow: 10px 10px 5px #888888;" src="http://localhost:1234/assets/img/anime/{%s popularAnimes[i].MALID %}.jpg"
-                                         data-holder-rendered="true">
-                                    <div class="uk-badge sliderThumbBadge">{%s popularAnimes[i].AnimeShowName %}</div>
-                                </div>
-                                {% endfor %}
-                            </div>
-                        </li>
-                    </ul>
-                    <a data-uk-slideshow-item="previous" class="uk-slidenav uk-slidenav-contrast uk-slidenav-previous" href="#"></a>
-                    <a data-uk-slideshow-item="next" class="uk-slidenav uk-slidenav-contrast uk-slidenav-next" href="#"></a>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+
+                    <a href="" class="uk-slidenav uk-slidenav-contrast uk-slidenav-previous" data-uk-slider-item="previous"></a>
+                    <a href="" class="uk-slidenav uk-slidenav-contrast uk-slidenav-next" data-uk-slider-item="next"></a>
+
                 </div>
             </div>
         </div>
     </div>
 </section>
 <!-- /Slider -->
-<!-- Today's Specials -->
-<section class="top-a">
-    <div class="container">
+
+<!-- Featured Animes -->
+<div class="or-spacer" style="background: #fcfcfc;">
+    <div class="mask"></div>
+    <span><i>Featured This Week</i></span>
+</div>
+<div class="container-fluid containerWhiteStripe">
+    <div class="container" style="padding-top: 4em;padding-bottom: 30px;">
         <div class="row">
             <div class="col-sm-12 col-md-12">
-                <div class="module title1">
-                    <h3 class="module-title">Latest Episodes</h3>
-                    <div class="module-content">
-                        <div class="uk-grid uk-grid-divider uk-text-center">
-                            {% for _, val := range recentAnimes %}
-                            <div data-uk-scrollspy="{cls:'uk-animation-fade', delay:600}"
-                                 class="uk-width-medium-1-5 uk-scrollspy-init-inview uk-scrollspy-inview uk-panel">
-                                <div class="uk-panel-badge uk-badge uk-badge-success gridSubThumbBadge">
-                                    {%s val.EpisodeList[len(val.EpisodeList)-1].Mirrors[0].SubDub %}
-                                </div>
-                                <p><img class="uk-align-center latestEpisodesThumb" data-uk-tooltip="{pos:'right', animation:true, activeClass:'latestEpisodesTooltip'}"
-                                        title="
-                                {% if len(val.AnimeShowDescription) > 500 %}
-                                    {%s val.AnimeShowDescription[:500] %}...
-                                {% else %}
-                                    {%s val.AnimeShowDescription %}
-                                {% endif %}
-                                "
-                                        src="http://localhost:1234/assets/img/anime/{%s val.MALID %}.jpg" alt="{%s val.MALTitle %}">
-                                </p>
-                                <div class="uk-panel-title">{%s val.AnimeShowName %}</div>
+                <div class="row">
+                        <div class="uk-slidenav-position" data-uk-slider="{infinite: true, autoplay: true, autoplayInterval: 4500}">
+                            <div class="uk-slider-container">
+                                <ul class="uk-slider uk-grid-width-medium-1-5 uk-grid-width-large-1-7" style="height:200px;min-height: 210px;">
+                                    {% for _, val := range featuredAnimes %}
+                                    <li>
+                                        <div class="uk-grid-medium uk-text-center wow fadeInUpBig slider-text animated" data-wow-delay="1.5s">
+                                            <figure class="uk-overlay uk-overlay-hover latestEpisodesThumbFigure" style="width: 145px;height: 160px">
+                                            <img class="uk-align-center latestEpisodesThumb" src="{%s imgCDNUrl %}/assets/img/smallestanime/{%s val.MALID %}.jpg" alt="{%s val.MALTitle %}" style="height:160px;width:120px;">
+                                            <a class="uk-position-cover" href="{%s base %}/wiki/{%s val.MALID %}/{%s val.WikiHash %}"></a>
+                                            </figure>
+                                            <div class="uk-panel-title" style="color: black;">
+                                                {% if val.MALEnglish == "" %}
+                                                {%s val.MALTitle %}
+                                                {% else %}
+                                                {%s val.MALEnglish %}
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </li>
+                                    {% endfor %}
+                                </ul>
                             </div>
-                            {% endfor %}
-                        </div>
+
+                            <a href="" class="uk-slidenav uk-slidenav-contrast uk-slidenav-previous" data-uk-slider-item="previous"></a>
+                            <a href="" class="uk-slidenav uk-slidenav-contrast uk-slidenav-next" data-uk-slider-item="next"></a>
+
                     </div>
                 </div>
-                <a href="/latest-episodes"><button class="uk-button uk-width-1-1" type="button">Load More</button></a>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /Featured Animes -->
+
+<!-- Latest News -->
+<div class="or-spacer">
+    <div class="mask"></div>
+    <span><i>Anime News/Blog</i></span>
+</div>
+<div class="container">
+    <div class="card-columns" style="padding-top: 27px;">
+        {% for i:=0; i<len(blogs); i++ %}
+        <a href="{%s base %}/blog/{%s blogs[i].Slug %}"><div class="card cardDesign">
+            <!-- Heading -->
+            <div class="card-block">
+                <h4 class="card-title" style="color: #fafafa;text-align: center;">{%s blogs[i].Title %}</h4>
+            </div>
+            <!-- Image -->
+            <img src="{%s blogs[i].ArticleImage %}" alt="{%s blogs[i].Title %}">
+            <!-- Text Content -->
+            <div class="card-block">
+                <p class="card-text" style="color:#fafafa;font-family: sans-serif;">
+                    {%code
+                    cleanDesc := sanitize.HTML(blogs[i].Article)
+                    %}
+                    {% if len(cleanDesc) > 100 %}
+                    {%s cleanDesc[:100] %}...
+                    {% else %}
+                    {%s cleanDesc %}
+                    {% endif %}
+                </p>
+            </div>
+        </div></a>
+        {% endfor %}
+    </div>
+</div>
+<!-- /Latest News -->
+<!-- Latest Anime Episodes -->
+<section class="top-a">
+    <div class="container">
+        <div class="module title1">
+            <h3 class="module-title titleHeading">Latest Anime Episodes</h3>
+        </div>
+        <div style="text-align:center;">
+            <script id="1l1uekj2b0ptu" data-cfasync="false">
+                (window._1l1uekj||(window._1l1uekj=[])).push({"id":"2b0ptu","sid":"1l1uekj","v":2});
+            </script>
+        </div>
+        <br>
+        <div class="row">
+            <div class="col-sm-12 col-md-12">
+                <div class="module-content">
+                    <div class="uk-grid uk-grid-divider uk-text-center">
+                        {% for i, val := range recentAnimes %}
+                        <div data-uk-scrollspy="{cls:'uk-animation-fade', delay:300}" class="uk-width-small-1-3 uk-width-medium-1-4 uk-width-large-1-5 uk-scrollspy-init-inview uk-scrollspy-inview uk-panel" style="padding-bottom: 20px">
+                            <figure class="uk-overlay uk-overlay-hover latestEpisodesThumbFigure">
+                                <img class="uk-align-center latestEpisodesThumb" src="{%s imgCDNUrl %}/assets/img/smallanime/{%s val.MALID %}.jpg" alt="{%s val.MALTitle %}">
+                                <div class='uk-panel-badge uk-badge uk-badge-success
+                                    {% if len(val.SubbedEpisodeList) > 0 %}
+                                        {%s " gridSubThumbBadge" %}
+                                    {% elseif len(val.EnglishDubbedEpisodeList) > 0 %}
+                                        {%s " gridDubThumbBadge" %}
+                                    {% endif %}
+                                '>test
+                                </div>
+                                <div class="uk-panel-badge uk-badge uk-badge-success gridEpisodeThumbBadge" style="background: #4080ff; color: #FFFFFF;">
+                                    {% if val.Type == "TV" %}
+                                        {%s "Ep. "%}{%s val.SubbedEpisodeList[episodeListHelper[i].EpisodeIndex].EpisodeID %}
+                                    {% else %}
+                                        {%s val.Type + " " %}{%s val.SubbedEpisodeList[episodeListHelper[i].EpisodeIndex].EpisodeID %}
+                                    {% endif %}
+                                </div>
+                                <div class="uk-overlay-panel uk-overlay-fade uk-overlay-background">
+                                    <button class="uk-button uk-button-mini animeThumbWatchButton" type="button">
+                                        Watch Anime
+                                    </button>
+                                    <div>
+                                        {% if len(val.MALDescription) > 200 %}
+                                            {%s cleanMALDescription(val.MALDescription[:200]) %}...
+                                        {% else %}
+                                            {%s cleanMALDescription(val.MALDescription) %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                {%code
+                                mHash := common.GetMirrorHash("sub", val, episodeListHelper[i].EpisodeIndex, 0)
+                                %}
+                                <a class="uk-position-cover" href="{%s base %}/watch/{%s val.MALID %}/{%s mHash %}/{%d episodeListHelper[i].EpisodeIndex %}/m/0"></a>
+                            </figure>
+                            <div class="uk-panel-title">
+                                <a style="color:black;" href="{%s base %}/watch/{%s val.MALID %}/{%s mHash %}/{%d episodeListHelper[i].EpisodeIndex %}/m/0">
+                                    {% if val.MALEnglish == "" %}
+                                        {%s val.MALTitle %}
+                                    {% else %}
+                                        {%s val.MALEnglish %}
+                                    {% endif %}
+                                </a>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <a href="/latest-episodes" class="uk-button uk-width-1-1" role="button">Load More</a>
             </div>
         </div>
     </div>
 </section>
-<!-- /Today's Specials -->
-<!-- Our Menu -->
+<!-- /Latest Anime Episodes -->
+<!-- On-Going Anime Series -->
 <section class="top-b">
     <div class="container">
         <div class="row">
             <div class="col-sm-12 col-md-12 top7">
                 <div class="module title1">
-                    <h3 class="module-title">On-Going Series</h3>
+                    <h3 class="module-title titleHeading">On-Going Anime Series</h3>
                 </div>
+                <div style="text-align:center;">
+                    <script id="1l1uekj12dhaco" data-cfasync="false">
+                        (window._1l1uekj||(window._1l1uekj=[])).push({"id":"12dhaco","sid":"1l1uekj","v":2});
+                    </script>
+                </div>
+                <br>
                 <div class="uk-grid uk-grid-divider uk-text-center">
                     {% for _, val := range ongoingAnimes %}
-                    <div data-uk-scrollspy="{cls:'uk-animation-fade', delay:600}"
-                         class="uk-width-medium-1-5 uk-scrollspy-init-inview uk-scrollspy-inview uk-panel">
-                        <div class="uk-panel-badge uk-badge uk-badge-success gridScoreThumbBadge">Score: {%f val.Score %}</div>
-                        <p><img class="uk-align-center latestEpisodesThumb" data-uk-tooltip="{pos:'right', animation:true, activeClass:'latestEpisodesTooltip'}"
-                                title="
-                                {% if len(val.AnimeShowDescription) > 500 %}
-                                    {%s val.AnimeShowDescription[:500] %}...
-                                {% else %}
-                                    {%s val.AnimeShowDescription %}
-                                {% endif %}
-                                "
-                                 src="http://localhost:1234/assets/img/anime/{%s val.MALID %}.jpg" alt="{%s val.MALTitle %}">
-                        </p>
-                        <div class="uk-panel-title">{%s val.AnimeShowName %}</div>
+                    <div data-uk-scrollspy="{cls:'uk-animation-fade', delay:300}" class="uk-width-small-1-3 uk-width-medium-1-4 uk-width-large-1-5 uk-scrollspy-init-inview uk-scrollspy-inview uk-panel" style="padding-bottom: 20px">
+                        <figure class="uk-overlay uk-overlay-hover latestEpisodesThumbFigure">
+                            <img class="uk-align-center latestEpisodesThumb" src="{%s imgCDNUrl %}/assets/img/smallanime/{%s val.MALID %}.jpg" alt="{%s val.MALTitle %}">
+                            <div class="uk-panel-badge uk-badge uk-badge-success gridScoreThumbBadge">Score:&nbsp;{%f val.Score %}</div>
+                            <div class="uk-overlay-panel uk-overlay-fade uk-overlay-background">
+                                <button class="uk-button uk-button-mini animeThumbWatchButton" type="button">
+                                    Watch Anime
+                                </button>
+                                <div>
+                                    {% if len(val.MALDescription) > 200 %}
+                                    {%s cleanMALDescription(val.MALDescription[:200]) %}...
+                                    {% else %}
+                                    {%s cleanMALDescription(val.MALDescription) %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <a class="uk-position-cover" href="{%s base %}/wiki/{%s val.MALID %}/{%s val.WikiHash %}"></a>
+                        </figure>
+                        <div class="uk-panel-title">
+                            {% if val.MALEnglish == "" %}
+                                {%s val.MALTitle %}
+                            {% else %}
+                                {%s val.MALEnglish %}
+                            {% endif %}
+                        </div>
                     </div>
                     {% endfor %}
                 </div>
-                <a href="/ongoing-series"><button class="uk-button uk-width-1-1" type="button">Load More</button></a>
+                <a href="/ongoing-series" class="uk-button uk-width-1-1" role="button">Load More</a>
             </div>
         </div>
     </div>
 </section>
-<!-- /Our Menu -->
-<!-- Fun Facts -->
+<!-- /On-Going Anime Series -->
+<!-- Animedom Statistics -->
 <section id="parallax-section-2">
     <div class="row">
         <div class="col-sm-12 col-md-12" id="parallax2">
@@ -137,24 +287,24 @@
                             </div>
                             <div class="uk-grid uk-grid-divider">
                                 <div class="uk-width-medium-1-5 uk-text-center">
-                                    <h6 class="merri38">4739</h6>
+                                    <h6 class="merri38">2600+</h6>
                                     <h5>Anime Series</h5>
                                 </div>
                                 <div class="uk-width-medium-1-5 uk-text-center">
-                                    <h6 class="merri38">34 215</h6>
+                                    <h6 class="merri38">48k+</h6>
                                     <h5>Anime Episodes</h5>
                                 </div>
                                 <div class="uk-width-medium-1-5 uk-text-center">
-                                    <h6 class="merri38">2728</h6>
+                                    <h6 class="merri38">100+</h6>
                                     <h5>Comments</h5>
                                 </div>
                                 <div class="uk-width-medium-1-5 uk-text-center">
-                                    <h6 class="merri38">1800+</h6>
+                                    <h6 class="merri38">700+</h6>
                                     <h5>Daily Views</h5>
                                 </div>
                                 <div class="uk-width-medium-1-5 uk-text-center">
-                                    <h6 class="merri38">9845</h6>
-                                    <h5>Idiots banned</h5>
+                                    <h6 class="merri38">500+</h6>
+                                    <h5>Anime Movies</h5>
                                 </div>
                             </div>
                         </div>
@@ -164,5 +314,7 @@
         </div>
     </div>
 </section>
-<!-- /Fun Facts -->
+<!-- /Animedom Statistics -->
 {% endfunc %}
+{% endstripspace %}
+{% endcollapsespace %}

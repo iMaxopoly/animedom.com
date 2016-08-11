@@ -1,0 +1,26 @@
+{% func PageErrorMessage(message string, base string) %}
+{% collapsespace %}
+{% stripspace %}
+<section class="top-b">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12 col-md-12 top7" id="title">
+                <div class="module title1">
+                    <h3 class="module-title">
+                        Whoops!
+                    </h3>
+                </div>
+                <div class="col-sm-12 col-md-12">
+                    <img class="img-responsive center-block" src="/assets/img/notfoundGirl.jpg">
+                </div>
+                <div class="col-sm-12 col-md-12">
+                    <h1 style="text-align: center">{%s message %}</h1><br>
+                    <a style="text-align: center" href="/"><h2>Anata wa ie ni kaeritaidesu ka?<br>(Want to go back home?)</h2></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endfunc %}
+{% endstripspace %}
+{% endcollapsespace %}

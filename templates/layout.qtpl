@@ -1,115 +1,266 @@
-{% code
-type Page struct {
-    Selection string
-    Title string
-    PageNum int
-    GridAnimes    []StructureAnime
-    OngoingAnimes []StructureAnime
-    PopularAnimes []StructureAnime
-    RecentAnimes  []StructureAnime
-}
-
-type StructureAnime struct {
-    MALID                string             `json:"MAL ID" storm:"id" gorethink:"id"`
-    AnimeShowName        string             `json:"AnimeShow Name" storm:"index" gorethink:"AnimeShowName"`
-    MALTitle             string             `json:"MAL Title" storm:"index" gorethink:"MALTitle"`
-    MALEnglish           string             `json:"MAL English Title" storm:"index" gorethink:"MALEnglish"`
-    AltName              string             `json:"Alternate Name, omitempty" storm:"index" gorethink:"AltName"`
-    Genre                []string           `json:"Genre" storm:"index" gorethink:"Genre"`
-    AnimeShowDescription string             `json:"AnimeShow Description" storm:"index" gorethink:"AnimeShowDescription"`
-    MALDescription       string             `json:"MAL Description" storm:"index" gorethink:"MALDescription"`
-    Score                float64            `json:"Score" storm:"index" gorethink:"Score"`
-    Studio               string             `json:"Studio Name" storm:"index" gorethink:"Studio"`
-    Status               string             `json:"Status" storm:"index" gorethink:"Status"`
-    Type                 string             `json:"Type" storm:"index" gorethink:"Type"`
-    SynonymNames         string             `json:"Synonym Names" storm:"index" gorethink:"SynonymNames"`
-    Year                 string             `json:"Year" storm:"index" gorethink:"Year"`
-    Image                string             `json:"Image Url" storm:"index" gorethink:"Image"`
-    Trailer              string             `json:"Trailer" storm:"index" gorethink:"Trailer"`
-    EpisodeList          []StructureEpisode `json:"Episode List" storm:"index" gorethink:"EpisodeList"`
-}
-
-type StructureEpisode struct {
-    Name    string            `json:"Episode Name" storm:"index" gorethink:"Name"`
-    Mirrors []StructureMirror `json:"Episode Mirrors" storm:"index" gorethink:"Mirrors"`
-}
-
-type StructureMirror struct {
-    Name   string `json:"Mirror Name" storm:"index" gorethink:"Name"`
-    Iframe string `json:"Embed Code" storm:"index" gorethink:"Iframe"`
-    SubDub string `json:"SubDub" storm:"index" gorethink:"SubDub"`
-}
-%}
-{% func PageLayout(p Page) %}
+{% collapsespace %}
+{% stripspace %}
+{% import "strings" %}
+{% import "animedom.com/common" %}
+{% import "animedom.com/projectModels" %}
+{% func PageLayout(p projectModels.StructurePage) %}
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Meta -->
-    <meta name="description" content="Animedom.com is the newest anime video watching website.">
-    <meta name="keywords" content="calimera, restaurant, bar, coffee shop, responsive, html, template, boostrap, responsive, html5, css3, jquery, theme, uikit, multicolor, parallax" />
-    <meta name="author" content="kryptodev">
-    <meta name="robots" content="index, follow" />
-    <title>AnimeDom.com - The Best Anime Under one Roof</title>
+    {% if p.Selection == "Home" %}
+        <link rel="canonical" href="{%s p.BaseURL %}" />
+        <meta name="description" content="Watch free Animes Online, HD Dubbed Animes Online and Anime Movies in the newest Anime Video Network. Thousands of Animes and daily updated!">
+        <meta name="keywords" content="watch dubbed anime, watch subbed anime, watch anime, watch anime online, watch free anime, english anime, sites to watch anime, english subbed anime" />
+        <meta name="robots" content="index, follow" />
+        <title>Watch The Best Animes Under one Roof - Animedom</title>
+    {% elseif p.Selection == "GridDisplay" %}
+        {% if strings.Contains(p.Title, "Genre Search Result") %}
+            <meta name="description" content="Top animes sorted by Genres.">
+            <meta name="keywords" content="top genres anime, action anime, genre search, english anime, sites to watch anime" />
+            <meta name="robots" content="index, follow" />
+            <title>Genre Search - Animedom</title>
+        {% else %}
+            {% if p.Title == "Latest Episodes" %}
+                <link rel="canonical" href="{%s p.BaseURL %}/latest-episodes" />
+            {% elseif p.Title == "Ongoing Series"%}
+                <link rel="canonical" href="{%s p.BaseURL %}/ongoing-series" />
+            {% elseif p.Title == "Top Rating" %}
+                <link rel="canonical" href="{%s p.BaseURL %}/top-rating" />
+            {% endif %}
+            <meta name="description" content="{%s p.Title+" " %}on Animedom.">
+            <meta name="keywords" content="{%s p.Title %}, watch dubbed anime, watch subbed anime, watch anime, watch anime online, watch free anime, english anime, sites to watch anime, english subbed anime" />
+            <meta name="robots" content="index, follow" />
+            <title>{%s p.Title+" " %}- Animedom</title>
+        {% endif %}
+    {% elseif p.Selection == "WatchVideo" %}
+        <link rel="canonical" href="{%s p.BaseURL %}/watch/{%s p.Anime.MALID %}/{%s common.GetMirrorHash("sub", p.Anime, p.EpisodeNum, p.MirrorNum) %}/{%d p.EpisodeNum %}/m/{%d p.MirrorNum %}" />
+        <meta name="description" content="Watch{%s " "+p.Anime.MALTitle+" " %}episode{%s " "+p.Anime.SubbedEpisodeList[p.EpisodeNum].EpisodeID+" subbed and dubbed " %}in high quality.">
+        <meta name="keywords" content="watch{%s " "+p.Anime.MALTitle %},{%s " "+p.Anime.MALTitle+" " %}episode{%s " " %}{%s p.Anime.SubbedEpisodeList[p.EpisodeNum].EpisodeID %},{%s " "+p.Anime.MALTitle+" " %}english subbed,{%s " "+p.Anime.MALTitle+" " %}subbed,
+         {% if len(p.Anime.SynonymNames) > 1 %}
+            {% for i, v := range(p.Anime.SynonymNames) %}
+                {% if i != len(p.Anime.SynonymNames)-1 %}
+                    {%s " watch "+v+" subbed" %},{%s " "+v+" english subbed" %},
+                {% else %}
+                    {%s " watch "+v+" subbed" %},{%s " "+v+" english subbed" %}
+                {% endif %}
+            {% endfor %}
+         {% endif %}" />
+        <meta name="robots" content="index, follow" />
+        <title>Watch{%s " "+p.Anime.MALTitle+" " %}Episode{%s " "+p.Anime.SubbedEpisodeList[p.EpisodeNum].EpisodeID+" subbed and dubbed in high quality." %}- Animedom</title>
+    {% elseif p.Selection == "AnimeDetail" %}
+        <link rel="canonical" href="{%s p.BaseURL %}/wiki/{%s p.Anime.MALID %}/{%s p.Anime.WikiHash %}" />
+        <meta name="description" content="{%s p.Anime.MALTitle+" " %}Details/Wiki">
+        <meta name="keywords" content="watch{%s " "+p.Anime.MALTitle %},{%s " "+p.Anime.MALTitle+" " %}episodes,{%s " " %}anime wiki,{%s " " %}english subbed,{%s " " %}subbed
+        {% if p.Anime.MALEnglish != "" && p.Anime.MALEnglish != p.Anime.MALTitle %}
+            {%s ", watch "+p.Anime.MALEnglish + ", "+p.Anime.MALEnglish+" subbed, "+p.Anime.MALEnglish+" dubbed" %}
+        {% endif %}
+        " />
+        <meta name="robots" content="index, follow" />
+        <title>Details:{%s " "+p.Anime.MALTitle+" " %}- Animedom</title>
+    {% elseif p.Selection == "BlogDisplay" %}
+        <link rel="canonical" href="{%s p.BaseURL %}/blog/{%s p.Blog.Slug %}" />
+        <meta name="keywords" content="{%s p.Blog.Keywords %}"/>
+        <meta name="robots" content="index, follow" />
+        <title>{%s p.Blog.Title+" " %}- Animedom</title>
+    {% endif %}
     <!-- Styles -->
+    <link rel="alternate" href="{%s p.BaseURL %}" hreflang="en-us" />
     <!-- Google Fonts -->
-    <link type="text/css" href="http://fonts.googleapis.com/css?family=Open+Sans:300,300italic,regular,italic,600,600italic,700,700italic,800,800italic&amp;subset=greek-ext" rel="stylesheet">
-    <link type="text/css" href="http://fonts.googleapis.com/css?family=Playfair+Display+SC:regular,italic,700,700italic,900,900italic&amp;subset=latin-ext" rel="stylesheet">
-    <!-- Pe-icon-7-stroke Fonts -->
-    <link href="http://localhost:1234/assets/css/helper.css" rel="stylesheet">
-    <link href="http://localhost:1234/assets/css/pe-icon-7-stroke.css" rel="stylesheet">
-    <!-- Uikit CSS -->
-    <link href="http://localhost:1234/assets/bower_components/uikit/css/uikit.almost-flat.css" rel="stylesheet">
-    <link href="http://localhost:1234/assets/bower_components/uikit/css/components/datepicker.almost-flat.css" rel="stylesheet">
-    <link href="http://localhost:1234/assets/bower_components/uikit/css/components/slidenav.almost-flat.css" rel="stylesheet">
-    <link href="http://localhost:1234/assets/bower_components/uikit/css/components/slideshow.almost-flat.css" rel="stylesheet">
-    <link href="http://localhost:1234/assets/bower_components/uikit/css/components/sticky.almost-flat.css" rel="stylesheet">
-    <link href="http://localhost:1234/assets/bower_components/uikit/css/components/tooltip.almost-flat.css" rel="stylesheet">
-    <!-- Bootstrap core CSS -->
-    <link href="http://localhost:1234/assets/bower_components/bootstrap/dist/css/bootstrap.css" rel="stylesheet">
-    <!-- Font Awesome -->
-    <link href="http://localhost:1234/assets/bower_components/font-awesome/css/font-awesome.css" rel="stylesheet">
-    <!-- Animate CSS -->
-    <link href="http://localhost:1234/assets/bower_components/animate.css/animate.css" rel="stylesheet" />
-    <!-- Strips CSS -->
-    <link href="http://localhost:1234/assets/css/strips.css" rel="stylesheet" />
-    <!-- Template CSS -->
-    <link href="http://localhost:1234/assets/css/template.css" rel="stylesheet">
-    <link href="http://localhost:1234/assets/css/color1.css" rel="stylesheet" type="text/css" title="color1">
-    <link href="http://localhost:1234/assets/css/custom.css" rel="stylesheet" type="text/css">
-    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
-    <!--[if lt IE 9]>
-    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-    <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <link rel="icon" type="image/x-icon" href="/assets/img/favicon.ico">
+    <link type="text/css" href="//fonts.googleapis.com/css?family=Open+Sans:300,300italic,regular,italic,600,600italic,700,700italic,800,800italic&amp;subset=greek-ext" rel="stylesheet">
+    <link href="//fonts.googleapis.com/css?family=Cherry+Swash" rel="stylesheet">
+    <link type="text/css" href="//fonts.googleapis.com/css?family=Playfair+Display+SC:regular,italic,700,700italic,900,900italic&amp;subset=latin-ext" rel="stylesheet">
+    <script src="{%s p.BaseURL %}/assets/js/scripts.min.js"></script>
+    <!-- ADVERTISEMENT BLOCK -->
+
+    <!-- TILLER.COM - START -->
+    {% switch p.BaseURL %}
+    {% case "http://animedom.to" %}
+        <script data-cfasync="false">/******* TILLER global tag - do not modify - Advertising on this site optimized by TILLER.COM *******/
+        !function(t,i,l,ler){
+            l='_'+t;(i[l]||(i[l]=[])).push({settings:{sid:t,v:3,esi:1}});
+            document.write('<script src="'+location.protocol+'//d16fvbyxlcp1p1.cloudfront.net/#'+t+'"><'+'/script>');
+        }('1l1uekj',window)
+        </script>
+    {% case "http://animedom.net" %}
+        <script data-cfasync="false">/******* TILLER global tag - do not modify - Advertising on this site optimized by TILLER.COM *******/
+        !function(t,i,l,ler){
+            l='_'+t;(i[l]||(i[l]=[])).push({settings:{sid:t,v:3,esi:1}});
+            document.write('<script src="'+location.protocol+'//d16fvbyxlcp1p1.cloudfront.net/#'+t+'"><'+'/script>');
+        }('6tc4w0',window)
+        </script>
+    {% case "http://animedom.com" %}
+        <script data-cfasync="false">/******* TILLER global tag - do not modify - Advertising on this site optimized by TILLER.COM *******/
+        !function(t,i,l,ler){
+            l='_'+t;(i[l]||(i[l]=[])).push({settings:{sid:t,v:3,esi:1}});
+            document.write('<script src="'+location.protocol+'//d16fvbyxlcp1p1.cloudfront.net/#'+t+'"><'+'/script>');
+        }('1hebtho',window)
+        </script>
+    {% case "http://animedom.org" %}
+        <script data-cfasync="false">/******* TILLER global tag - do not modify - Advertising on this site optimized by TILLER.COM *******/
+        !function(t,i,l,ler){
+            l='_'+t;(i[l]||(i[l]=[])).push({settings:{sid:t,v:3,esi:1}});
+            document.write('<script src="'+location.protocol+'//d16fvbyxlcp1p1.cloudfront.net/#'+t+'"><'+'/script>');
+        }('1w0tpqb',window)
+        </script>
+    {% case "http://animedom.tv" %}
+        <script data-cfasync="false">/******* TILLER global tag - do not modify - Advertising on this site optimized by TILLER.COM *******/
+        !function(t,i,l,ler){
+            l='_'+t;(i[l]||(i[l]=[])).push({settings:{sid:t,v:3,esi:1}});
+            document.write('<script src="'+location.protocol+'//d16fvbyxlcp1p1.cloudfront.net/#'+t+'"><'+'/script>');
+        }('11rujy7',window)
+        </script>
+    {% endswitch %}
+    <!-- TILLER.COM - END -->
+
+
+    <!-- ADVERTISEMENT BLOCK -->
     <![endif]-->
 </head>
 
 <body class="body1">
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0];
+    if (d.getElementById(id)) return;
+    js = d.createElement(s); js.id = id;
+    js.src = "//connect.facebook.net/en_GB/sdk.js#xfbml=1&version=v2.6";
+    fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
 <!-- Wrap all page content -->
 <div class="body-innerwrapper" id="page-top">
+    <!-- Header Menu -->
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12 col-md-6" style="text-align: left;">
+                <a href="javascript:window.open('https://www.paypal.me/animedom','Terms and Conditions','width=500,height=500')" class="subNavTop"><i class="uk-icon-heart"></i> Support Us</a>
+                <a href="/coming-soon" class="subNavTop"><i class="uk-icon-commenting"></i> Shoutbox Popup</a>
+                <a href="/a-z-list" class="subNavTop"><i class="uk-icon-list-alt"></i> A-Z List</a>
+            </div>
+            <!--<div class="col-sm-12 col-md-8 col-md-offset-4" style="text-align: right;">-->
+            <div class="col-sm-12 col-md-6" style="text-align: right;">
+                <a href="/coming-soon" class="uk-button uk-button-primary uk-button-mini"><i class="uk-icon-sign-in"></i> Login</a>
+                <a href="/coming-soon" class="uk-button uk-button-mini"><i class="uk-icon-user"></i> Register</a>
+            </div>
+        </div>
+    </div>
+    <!-- /Header Menu -->
+
     <!-- Top Bar -->
-    <section id="top-bar" class="top-bar">
+    <section id="top-bar" class="top-bar" style="padding:0 0 50px 0">
         <div class="container">
             <div class="row">
                 <div class="col-sm-3 col-md-3 hidden-sm hidden-xs top1" id="top1">
                     <ul class="social-icons">
-                        <li><a href="https://www.facebook.com/animedom" target="_blank"><i class="fa fa-facebook"></i></a></li>
-                        <li><a href="https://twitter.com/animedom" target="_blank"><i class="fa fa-twitter"></i></a></li>
-                        <li><a href="https://plus.google.com/animedom" target="_blank"><i class="fa fa-google-plus"></i></a></li>
+                        <li><a href="https://www.facebook.com/AnimedomSocial" target="_blank"><i class="fa fa-facebook"></i></a></li>
+                        <li><a href="https://twitter.com/AnimedomSocial" target="_blank"><i class="fa fa-twitter"></i></a></li>
+                        <li><a href="https://plus.google.com/117516327730388259137" target="_blank"><i class="fa fa-google-plus"></i></a></li>
                     </ul>
                 </div>
                 <div class="col-xs-10 col-sm-10 col-md-6 logo-wrap" id="logo">
-                    <a href="index.html" class="logo">
-                        <h1><img alt="Calimera" src="http://localhost:1234/assets/img/logo.png" class="default-logo"></h1>
+                    <a href="{%s p.BaseURL %}" class="logo">
+                        <h1><img alt="animedom-logo" src="{%s p.BaseURL %}/assets/img/logo.png" class="default-logo"></h1>
                     </a>
                 </div>
-                <div class="col-sm-3 col-md-3 hidden-sm hidden-xs top2" id="top2">
-                    <form class="uk-search" data-uk-search>
-                        <input class="uk-search-field" type="search" placeholder="Search...">
+                <div class="col-sm-3 col-md-3 hidden-lg-down top2" id="top2">
+                    <form class="uk-search" action="/search" data-uk-search="{source:'/search/animelist'}">
+                        <input class="uk-search-field" name="term" type="search" placeholder="    Search..." autocomplete="off">
+                        <script type="text/autocomplete">
+                            <ul class="uk-nav uk-nav-autocomplete uk-autocomplete-results">
+                                {{~items}}
+                                    {{#$item.islast}}
+                                    <li>
+                                        <a href="/search?term={{ $item.searchterm }}" class="uk-button uk-width-1-1 navGenreSearchButton" style="color:white;" role="button">Show More</a>
+                                    </li>
+                                    {{/$item.islast}}
+                                    {{^$item.islast}}
+                                    <li>
+                                        <a href={{ $item.url }}>
+                                        <div class="uk-grid uk-grid-collapse"
+                                         style="border-style: double;
+                                                border-color: #d8d6d6;
+                                                border-left: none;
+                                                border-right: none;">
+                                            <div class="uk-width-1-4">
+                                                <img style="height: 100px;width: 80px;" src="{{ $item.img }}" alt="{{ $item.title }}" />
+                                            </div>
+                                            <div class="uk-width-3-4"
+                                            style="text-align: left;
+                                                   border-style: ridge;
+                                                   border-right: none;
+                                                   border-top: none;
+                                                   border-bottom: none;">
+                                                <div style="font-size: medium;font-family: Playfair Display SC, Helvetica;text-align: center;">{{ $item.title }}
+                                                    <div class="uk-badge" style="padding: 1px;font-size: 10px;background-color: #ef4c4a;">{{ $item.type }}</div>
+                                                </div>
+                                                <div style="font-size: x-small;">Genre: <b style="color:black;">{{ $item.genre }}</b></div>
+                                            </div>
+                                        </div>
+                                        </a>
+                                    </li>
+                                    {{/$item.islast}}
+                                {{/items}}
+                            </ul>
+                        </script>
                     </form>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-12 col-sm-12 col-md-12 hidden-lg-down hidden-xl-up uk-text-center top1">
+                    <form class="uk-search" action="/search" data-uk-search="{source:'/search/animelist'}">
+                        <input class="uk-search-field" name="term" type="search" placeholder="    Search..." autocomplete="off">
+                        <script type="text/autocomplete">
+                            <ul class="uk-nav uk-nav-autocomplete uk-autocomplete-results">
+                                {{~items}}
+                                    {{#$item.islast}}
+                                    <li>
+                                        <a href="/search?term={{ $item.searchterm }}" class="uk-button uk-width-1-1 navGenreSearchButton" style="color:white;" role="button">Show More</a>
+                                    </li>
+                                    {{/$item.islast}}
+                                    {{^$item.islast}}
+                                    <li>
+                                        <a href={{ $item.url }}>
+                                        <div class="uk-grid uk-grid-collapse"
+                                         style="border-style: double;
+                                                border-color: #d8d6d6;
+                                                border-left: none;
+                                                border-right: none;">
+                                            <div class="uk-width-1-4">
+                                                <img style="height: 100px;width: 80px;" src="{{ $item.img }}" alt="{{ $item.title }}" />
+                                            </div>
+                                            <div class="uk-width-3-4"
+                                            style="text-align: left;
+                                                   border-style: ridge;
+                                                   border-right: none;
+                                                   border-top: none;
+                                                   border-bottom: none;">
+                                                <div style="font-size: medium;font-family: Playfair Display SC, Helvetica;text-align: center;">{{ $item.title }}
+                                                    <div class="uk-badge" style="padding: 1px;font-size: 10px;background-color: #ef4c4a;">{{ $item.type }}</div>
+                                                </div>
+                                                <div style="font-size: x-small;">Genre: <b style="color:black;">{{ $item.genre }}</b></div>
+                                            </div>
+                                        </div>
+                                        </a>
+                                    </li>
+                                    {{/$item.islast}}
+                                {{/items}}
+                            </ul>
+                        </script>
+                    </form>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-12 col-sm-12 col-md-12 hidden-xl-up uk-text-center top1">
+                    <ul class="social-icons">
+                        <li><a href="https://www.facebook.com/AnimedomSocial" target="_blank"><i class="fa fa-facebook"></i></a></li>
+                        <li><a href="https://twitter.com/AnimedomSocial" target="_blank"><i class="fa fa-twitter"></i></a></li>
+                        <li><a href="https://plus.google.com/117516327730388259137" target="_blank"><i class="fa fa-google-plus"></i></a></li>
+                    </ul>
                 </div>
             </div>
         </div>
@@ -123,258 +274,195 @@ type StructureMirror struct {
                     <div class="col-xs-12 col-sm-12 col-md-12 menu" id="menu">
                         <div class="megamenu-wrapper">
                             <a href="#" id="offcanvas-toggler"><i class="uk-icon-bars"></i></a>
-                            <ul class="megamenu-parent menu-fade hidden-xs hidden-sm hidden-md">
+                            <div class="uk-navbar-content hidden-xl-up" style="position: relative; top: 10px;">
+                                <form class="uk-search" action="/search" data-uk-search="{source:'/search/animelist'}">
+                                    <input class="uk-search-field" name="term" type="search" placeholder="    Search..." autocomplete="off">
+                                    <script type="text/autocomplete">
+                            <ul class="uk-nav uk-nav-autocomplete uk-autocomplete-results">
+                                {{~items}}
+                                    {{#$item.islast}}
+                                    <li>
+                                        <a href="/search?term={{ $item.searchterm }}" class="uk-button uk-width-1-1 navGenreSearchButton" style="color:white;" role="button">Show More</a>
+                                    </li>
+                                    {{/$item.islast}}
+                                    {{^$item.islast}}
+                                    <li>
+                                        <a href={{ $item.url }}>
+                                        <div class="uk-grid uk-grid-collapse"
+                                         style="border-style: double;
+                                                border-color: #d8d6d6;
+                                                border-left: none;
+                                                border-right: none;">
+                                            <div class="uk-width-1-4">
+                                                <img style="height: 100px;width: 80px;" src="{{ $item.img }}" alt="{{ $item.title }}" />
+                                            </div>
+                                            <div class="uk-width-3-4"
+                                            style="text-align: left;
+                                                   border-style: ridge;
+                                                   border-right: none;
+                                                   border-top: none;
+                                                   border-bottom: none;">
+                                                <div style="font-size: medium;font-family: Playfair Display SC, Helvetica;text-align: center;">{{ $item.title }}
+                                                    <div class="uk-badge" style="padding: 1px;font-size: 10px;background-color: #ef4c4a;">{{ $item.type }}</div>
+                                                </div>
+                                                <div style="font-size: x-small;">Genre: <b style="color:black;">{{ $item.genre }}</b></div>
+                                            </div>
+                                        </div>
+                                        </a>
+                                    </li>
+                                    {{/$item.islast}}
+                                {{/items}}
+                            </ul>
+                        </script>
+                                </form>
+                            </div>
+                            <ul class="megamenu-parent menu-fade hidden-lg-down">
                                 <li class="menu-item active"><a href="/">Home</a></li>
-                                <li class="menu-item"><a href="/top-rating">Top Rating</a></li>
-                                <li class="menu-item"><a href="/latest-episodes">Latest Episodes</a></li>
-                                <li class="menu-item"><a href="/ongoing-series">Ongoing Series</a></li>
-                                <li class="menu-item has-child menu-justify">
-                                    <a href="#">Genre Search</a>
-                                    <div class="dropdown dropdown-main dropdown-mega menu-left">
+                                <li class="menu-item"><a href="/coming-soon">Forum</a></li>
+                                <li class="menu-item"><a href="/blogs">News</a></li>
+                                <li class="menu-item has-child active menu-justify">
+                                    <a href="#">Watch Anime</a>
+                                    <div class="dropdown dropdown-main dropdown-mega menu-down menu-480">
                                         <div class="dropdown-inner">
                                             <div class="row">
-                                                <div class="col-sm-2">
+                                                <div class="col-sm-6">
                                                     <ul class="mega-group">
-                                                        <li class="menu-item has-child">
+                                                        <li class="menu-item has-child active">
+                                                            <a class="group-title" href="#">By Lists</a>
                                                             <ul class="mega-group-child dropdown-items">
-                                                                <li class="menu-item navGenreCheckboxList">
-                                                                    <label>
-                                                                        <input type="checkbox"> Action</label>
-                                                                </li>
-                                                                <li class="menu-item navGenreCheckboxList">
-                                                                    <label>
-                                                                        <input type="checkbox"> Adventure</label>
-                                                                </li>
-                                                                <li class="menu-item navGenreCheckboxList">
-                                                                    <label>
-                                                                        <input type="checkbox"> Cars</label>
-                                                                </li>
-                                                                <li class="menu-item navGenreCheckboxList">
-                                                                    <label>
-                                                                        <input type="checkbox"> Comedy</label>
-                                                                </li>
-                                                                <li class="menu-item navGenreCheckboxList">
-                                                                    <label>
-                                                                        <input type="checkbox"> Demons</label>
-                                                                </li>
-                                                                <li class="menu-item navGenreCheckboxList">
-                                                                    <label>
-                                                                        <input type="checkbox"> Drama</label>
-                                                                </li>
-                                                                <li class="menu-item navGenreCheckboxList">
-                                                                    <label>
-                                                                        <input type="checkbox"> Ecchi</label>
-                                                                </li>
-                                                                <li class="menu-item navGenreCheckboxList">
-                                                                    <label>
-                                                                        <input type="checkbox"> Fantasy</label>
-                                                                </li>
+                                                                <li class="menu-item"><a href="/popular-anime">Popular this Season</a></li>
+                                                                <li class="menu-item"><a href="/top-rating">MAL Top Rated</a></li>
+                                                                <li class="menu-item"><a href="/latest-episodes">Latest Episodes</a></li>
+                                                                <li class="menu-item"><a href="/ongoing-series">Currently Airing</a></li>
+                                                                <li class="menu-item"><a href="/classic-anime">Old Classics</a></li>
                                                             </ul>
                                                         </li>
                                                     </ul>
                                                 </div>
-                                                <div class="col-sm-2">
+                                                <div class="col-sm-6">
                                                     <ul class="mega-group">
-                                                        <li class="menu-item has-child">
+                                                        <li class="menu-item has-child active">
+                                                            <a class="group-title" href="#">By Mood</a>
                                                             <ul class="mega-group-child dropdown-items">
-                                                                <li class="menu-item navGenreCheckboxList">
-                                                                    <label>
-                                                                        <input type="checkbox"> Ecchi</label>
-                                                                </li>
-                                                                <li class="menu-item navGenreCheckboxList">
-                                                                    <label>
-                                                                        <input type="checkbox"> Fantasy</label>
-                                                                </li>
-                                                                <li class="menu-item navGenreCheckboxList">
-                                                                    <label>
-                                                                        <input type="checkbox"> Game</label>
-                                                                </li>
-                                                                <li class="menu-item navGenreCheckboxList">
-                                                                    <label>
-                                                                        <input type="checkbox"> Harem</label>
-                                                                </li>
-                                                                <li class="menu-item navGenreCheckboxList">
-                                                                    <label>
-                                                                        <input type="checkbox"> Historical</label>
-                                                                </li>
-                                                                <li class="menu-item navGenreCheckboxList">
-                                                                    <label>
-                                                                        <input type="checkbox"> Horror</label>
-                                                                </li>
-                                                                <li class="menu-item navGenreCheckboxList">
-                                                                    <label>
-                                                                        <input type="checkbox"> Demons</label>
-                                                                </li>
-                                                                <li class="menu-item navGenreCheckboxList">
-                                                                    <label>
-                                                                        <input type="checkbox"> Drama</label>
-                                                                </li>
+                                                                <li class="menu-item"><a href="/inspiring-anime">Inspire Me</a></li>
+                                                                <li class="menu-item"><a href="/thrilling-anime">Thriller</a></li>
+                                                                <li class="menu-item"><a href="/emotional-anime">Tear jerker</a></li>
+                                                                <li class="menu-item"><a href="/ecchi-anime">Ecchi</a></li>
+                                                                <li class="menu-item"><a href="/action-anime">Action</a></li>
                                                             </ul>
                                                         </li>
                                                     </ul>
-                                                </div>
-                                                <div class="col-sm-2">
-                                                    <ul class="mega-group">
-                                                        <li class="menu-item has-child">
-                                                            <ul class="mega-group-child dropdown-items">
-                                                                <li class="menu-item navGenreCheckboxList">
-                                                                    <label>
-                                                                        <input type="checkbox"> Josei</label>
-                                                                </li>
-                                                                <li class="menu-item navGenreCheckboxList">
-                                                                    <label>
-                                                                        <input type="checkbox"> Kids</label>
-                                                                </li>
-                                                                <li class="menu-item navGenreCheckboxList">
-                                                                    <label>
-                                                                        <input type="checkbox"> Magic</label>
-                                                                </li>
-                                                                <li class="menu-item navGenreCheckboxList">
-                                                                    <label>
-                                                                        <input type="checkbox"> Martial Arts</label>
-                                                                </li>
-                                                                <li class="menu-item navGenreCheckboxList">
-                                                                    <label>
-                                                                        <input type="checkbox"> Mecha</label>
-                                                                </li>
-                                                                <li class="menu-item navGenreCheckboxList">
-                                                                    <label>
-                                                                        <input type="checkbox"> Military</label>
-                                                                </li>
-                                                                <li class="menu-item navGenreCheckboxList">
-                                                                    <label>
-                                                                        <input type="checkbox"> Cars</label>
-                                                                </li>
-                                                                <li class="menu-item navGenreCheckboxList">
-                                                                    <label>
-                                                                        <input type="checkbox"> Comedy</label>
-                                                                </li>
-                                                            </ul>
-                                                        </li>
-                                                    </ul>
-                                                </div>
-                                                <div class="col-sm-2">
-                                                    <ul class="mega-group">
-                                                        <li class="menu-item has-child">
-                                                            <ul class="mega-group-child dropdown-items">
-                                                                <li class="menu-item navGenreCheckboxList">
-                                                                    <label>
-                                                                        <input type="checkbox"> Music</label>
-                                                                </li>
-                                                                <li class="menu-item navGenreCheckboxList">
-                                                                    <label>
-                                                                        <input type="checkbox"> Mystery</label>
-                                                                </li>
-                                                                <li class="menu-item navGenreCheckboxList">
-                                                                    <label>
-                                                                        <input type="checkbox"> Parody</label>
-                                                                </li>
-                                                                <li class="menu-item navGenreCheckboxList">
-                                                                    <label>
-                                                                        <input type="checkbox"> Police</label>
-                                                                </li>
-                                                                <li class="menu-item navGenreCheckboxList">
-                                                                    <label>
-                                                                        <input type="checkbox"> Psychological</label>
-                                                                </li>
-                                                                <li class="menu-item navGenreCheckboxList">
-                                                                    <label>
-                                                                        <input type="checkbox"> Romance</label>
-                                                                </li>
-                                                                <li class="menu-item navGenreCheckboxList">
-                                                                    <label>
-                                                                        <input type="checkbox"> Adventure</label>
-                                                                </li>
-                                                                <li class="menu-item navGenreCheckboxList">
-                                                                    <label>
-                                                                        <input type="checkbox"> Vampire</label>
-                                                                </li>
-                                                            </ul>
-                                                        </li>
-                                                    </ul>
-                                                </div>
-                                                <div class="col-sm-2">
-                                                    <ul class="mega-group">
-                                                        <li class="menu-item has-child">
-                                                            <ul class="mega-group-child dropdown-items">
-                                                                <li class="menu-item navGenreCheckboxList">
-                                                                    <label>
-                                                                        <input type="checkbox"> Samurai</label>
-                                                                </li>
-                                                                <li class="menu-item navGenreCheckboxList">
-                                                                    <label>
-                                                                        <input type="checkbox"> School</label>
-                                                                </li>
-                                                                <li class="menu-item navGenreCheckboxList">
-                                                                    <label>
-                                                                        <input type="checkbox"> Sci-Fi</label>
-                                                                </li>
-                                                                <li class="menu-item navGenreCheckboxList">
-                                                                    <label>
-                                                                        <input type="checkbox"> Seinen</label>
-                                                                </li>
-                                                                <li class="menu-item navGenreCheckboxList">
-                                                                    <label>
-                                                                        <input type="checkbox"> Shoujo</label>
-                                                                </li>
-                                                                <li class="menu-item navGenreCheckboxList">
-                                                                    <label>
-                                                                        <input type="checkbox"> Shounen</label>
-                                                                </li>
-                                                                <li class="menu-item navGenreCheckboxList">
-                                                                    <label>
-                                                                        <input type="checkbox"> Action</label>
-                                                                </li>
-                                                            </ul>
-                                                        </li>
-                                                    </ul>
-                                                </div>
-                                                <div class="col-sm-2">
-                                                    <ul class="mega-group">
-                                                        <li class="menu-item has-child">
-                                                            <ul class="mega-group-child dropdown-items">
-                                                                <li class="menu-item navGenreCheckboxList">
-                                                                    <label>
-                                                                        <input type="checkbox"> Shounen Ai</label>
-                                                                </li>
-                                                                <li class="menu-item navGenreCheckboxList">
-                                                                    <label>
-                                                                        <input type="checkbox"> Slice of life</label>
-                                                                </li>
-                                                                <li class="menu-item navGenreCheckboxList">
-                                                                    <label>
-                                                                        <input type="checkbox"> Space</label>
-                                                                </li>
-                                                                <li class="menu-item navGenreCheckboxList">
-                                                                    <label>
-                                                                        <input type="checkbox"> Sports</label>
-                                                                </li>
-                                                                <li class="menu-item navGenreCheckboxList">
-                                                                    <label>
-                                                                        <input type="checkbox"> Super Power</label>
-                                                                </li>
-                                                                <li class="menu-item navGenreCheckboxList">
-                                                                    <label>
-                                                                        <input type="checkbox"> Supernatural</label>
-                                                                </li>
-                                                                <li class="menu-item navGenreCheckboxList">
-                                                                    <label>
-                                                                        <input type="checkbox"> Thriller</label>
-                                                                </li>
-                                                            </ul>
-                                                        </li>
-                                                    </ul>
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-sm-12">
-                                                    <button class="uk-button uk-width-1-1 navGenreSearchButton" type="button">Search...</button>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 </li>
-                                <li class="menu-item"><a href="/contact">Contact Us</a></li>
+                                <li class="menu-item"><a href="/feeling-lucky">Feeling Lucky</a></li>
+                                <li class="menu-item"><a href="/movies">Top Movies</a></li>
+                                <li class="menu-item has-child menu-justify">
+                                    <a href="#">Genre Search</a>
+                                    <div class="dropdown dropdown-main dropdown-mega menu-left">
+                                        <div class="dropdown-inner">
+                                            <form action="/genre/filter/1" method="post">
+                                            <div class="row">
+                                                <div class="col-sm-2">
+                                                    <ul class="mega-group">
+                                                        <li class="menu-item has-child">
+                                                            <ul class="mega-group-child dropdown-items">
+                                                                <li class="menu-item navGenreCheckboxList"><label><input type="checkbox" name="genre" value="Action"> Action </label></li>
+                                                                <li class="menu-item navGenreCheckboxList"><label><input type="checkbox" name="genre" value="Adventure"> Adventure </label></li>
+                                                                <li class="menu-item navGenreCheckboxList"><label><input type="checkbox" name="genre" value="Cars"> Cars </label></li>
+                                                                <li class="menu-item navGenreCheckboxList"><label><input type="checkbox" name="genre" value="Comedy"> Comedy </label></li>
+                                                                <li class="menu-item navGenreCheckboxList"><label><input type="checkbox" name="genre" value="Demons"> Demons </label></li>
+                                                                <li class="menu-item navGenreCheckboxList"><label><input type="checkbox" name="genre" value="Drama"> Drama </label></li>
+                                                            </ul>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                                <div class="col-sm-2">
+                                                    <ul class="mega-group">
+                                                        <li class="menu-item has-child">
+                                                            <ul class="mega-group-child dropdown-items">
+                                                                <li class="menu-item navGenreCheckboxList"><label><input type="checkbox" name="genre" value="Ecchi"> Ecchi </label></li>
+                                                                <li class="menu-item navGenreCheckboxList"><label><input type="checkbox" name="genre" value="Fantasy"> Fantasy </label></li>
+                                                                <li class="menu-item navGenreCheckboxList"><label><input type="checkbox" name="genre" value="Game"> Game </label></li>
+                                                                <li class="menu-item navGenreCheckboxList"><label><input type="checkbox" name="genre" value="Harem"> Harem </label></li>
+                                                                <li class="menu-item navGenreCheckboxList"><label><input type="checkbox" name="genre" value="Historical"> Historical </label></li>
+                                                                <li class="menu-item navGenreCheckboxList"><label><input type="checkbox" name="genre" value="Horror"> Horror </label></li>
+                                                            </ul>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                                <div class="col-sm-2">
+                                                    <ul class="mega-group">
+                                                        <li class="menu-item has-child">
+                                                            <ul class="mega-group-child dropdown-items">
+                                                                <li class="menu-item navGenreCheckboxList"><label><input type="checkbox" name="genre" value="Josei"> Josei </label></li>
+                                                                <li class="menu-item navGenreCheckboxList"><label><input type="checkbox" name="genre" value="Kids"> Kids </label></li>
+                                                                <li class="menu-item navGenreCheckboxList"><label><input type="checkbox" name="genre" value="Magic"> Magic </label></li>
+                                                                <li class="menu-item navGenreCheckboxList"><label><input type="checkbox" name="genre" value="Martial Arts"> Martial Arts </label></li>
+                                                                <li class="menu-item navGenreCheckboxList"><label><input type="checkbox" name="genre" value="Mecha"> Mecha </label></li>
+                                                                <li class="menu-item navGenreCheckboxList"><label><input type="checkbox" name="genre" value="Military"> Military </label></li>
+                                                            </ul>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                                <div class="col-sm-2">
+                                                    <ul class="mega-group">
+                                                        <li class="menu-item has-child">
+                                                            <ul class="mega-group-child dropdown-items">
+                                                                <li class="menu-item navGenreCheckboxList"><label><input type="checkbox" name="genre" value="Music"> Music </label></li>
+                                                                <li class="menu-item navGenreCheckboxList"><label><input type="checkbox" name="genre" value="Mystery"> Mystery </label></li>
+                                                                <li class="menu-item navGenreCheckboxList"><label><input type="checkbox" name="genre" value="Parody"> Parody </label></li>
+                                                                <li class="menu-item navGenreCheckboxList"><label><input type="checkbox" name="genre" value="Police"> Police </label></li>
+                                                                <li class="menu-item navGenreCheckboxList"><label><input type="checkbox" name="genre" value="Psychological"> Psychological </label></li>
+                                                                <li class="menu-item navGenreCheckboxList"><label><input type="checkbox" name="genre" value="Romance"> Romance </label></li>
+                                                                <li class="menu-item navGenreCheckboxList"><label><input type="checkbox" name="genre" value="Samurai"> Samurai </label></li>
+                                                            </ul>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                                <div class="col-sm-2">
+                                                    <ul class="mega-group">
+                                                        <li class="menu-item has-child">
+                                                            <ul class="mega-group-child dropdown-items">
+                                                                <li class="menu-item navGenreCheckboxList"><label><input type="checkbox" name="genre" value="School"> School </label></li>
+                                                                <li class="menu-item navGenreCheckboxList"><label><input type="checkbox" name="genre" value="Sci-Fi"> Sci-Fi </label></li>
+                                                                <li class="menu-item navGenreCheckboxList"><label><input type="checkbox" name="genre" value="Seinen"> Seinen </label></li>
+                                                                <li class="menu-item navGenreCheckboxList"><label><input type="checkbox" name="genre" value="Shoujo"> Shoujo </label></li>
+                                                                <li class="menu-item navGenreCheckboxList"><label><input type="checkbox" name="genre" value="Shounen"> Shounen </label></li>
+                                                                <li class="menu-item navGenreCheckboxList"><label><input type="checkbox" name="genre" value="Shounen Ai"> Shounen Ai </label></li>
+                                                                <li class="menu-item navGenreCheckboxList"><label><input type="checkbox" name="genre" value="Slice of life"> Slice of life </label></li>
+                                                            </ul>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                                <div class="col-sm-2">
+                                                    <ul class="mega-group">
+                                                        <li class="menu-item has-child">
+                                                            <ul class="mega-group-child dropdown-items">
+                                                                <li class="menu-item navGenreCheckboxList"><label><input type="checkbox" name="genre" value="Space"> Space </label></li>
+                                                                <li class="menu-item navGenreCheckboxList"><label><input type="checkbox" name="genre" value="Sports"> Sports </label></li>
+                                                                <li class="menu-item navGenreCheckboxList"><label><input type="checkbox" name="genre" value="Supernatural"> Supernatural </label></li>
+                                                                <li class="menu-item navGenreCheckboxList"><label><input type="checkbox" name="genre" value="Super Power"> Super Power </label></li>
+                                                                <li class="menu-item navGenreCheckboxList"><label><input type="checkbox" name="genre" value="Thriller"> Thriller </label></li>
+                                                                <li class="menu-item navGenreCheckboxList"><label><input type="checkbox" name="genre" value="Vampire"> Vampire </label></li>
+                                                            </ul>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-sm-12">
+                                                    <button class="uk-button uk-width-1-1 navGenreSearchButton" type="submit" value="Submit">Search...</button>
+                                                </div>
+                                            </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="menu-item"><a href="/disclaimer">Disclaimer</a></li>
                             </ul>
                         </div>
                     </div>
@@ -384,23 +472,44 @@ type StructureMirror struct {
     </div>
     <!-- /Sticky Menu -->
     {% if p.Selection == "Home" %}
-        {%= PageHome(p.OngoingAnimes, p.PopularAnimes, p.RecentAnimes) %}
+        {%= PageHome(p.OngoingAnimes, p.PopularAnimes, p.RecentAnimes, p.FeaturedAnimes, p.EpisodeIDs, p.Blogs, p.BaseURL) %}
+    {% elseif p.Selection == "BlogListDisplay" %}
+        {%= PageBlogListDisplay(p.Blogs, p.BaseURL) %}
+    {% elseif p.Selection == "BlogDisplay" %}
+        {%= PageBlogDisplay(p.Blog, p.BaseURL) %}
     {% elseif p.Selection == "GridDisplay" %}
-        {%= PageGridDisplay(p.Title, p.GridAnimes) %}
+        {%= PageGridDisplay(p.Title, p.ResultCount, p.PageNum, p.GridAnimes, p.EpisodeIDs, p.BaseURL) %}
     {% elseif p.Selection == "WatchVideo" %}
-        {%= PageWatchVideo() %}
+        {%= PageWatchVideo(p.Anime, p.SimilarAnimes, p.EpisodeNum, p.MirrorNum, p.BaseURL) %}
+    {% elseif p.Selection == "AnimeDetail" %}
+        {%= PageAnimeDetail(p.Anime, p.BaseURL) %}
+    {% elseif p.Selection == "ErrorMessage" %}
+        {%= PageErrorMessage(p.ErrorMsg, p.BaseURL) %}
+    {% elseif p.Selection == "Disclaimer" %}
+        {%= PageDisclaimer(p.BaseURL) %}
+    {% elseif p.Selection == "AZListDisplay" %}
+        {%= PageAZlist(p.BaseURL, p.Title, p.AZAlphabet, p.TableAnimes, p.ResultCount, p.PageNum) %}
+    {% elseif p.Selection == "ComingSoon" %}
+        {%= PageComingSoon(p.ErrorMsg, p.BaseURL)  %}
     {% endif %}
     <!-- Bottom -->
     <section class="bottom-b">
         <div class="container">
             <div class="row">
+                <div class="col-sm-12 col-md-6 col-md-offset-3 uk-text-center">
+
+                </div>
+            </div>
+        </div>
+        <div class="container">
+            <div class="row">
                 <div class="col-sm-6 col-md-3">
                     <div class="module ">
                         <div class="module-content">
-                            <img alt="Animedom.com | About Us" src="http://localhost:1234/assets/img/logo.png">
+                            <img alt="Animedom | About Us" src="{%s p.BaseURL %}/assets/img/logo.png">
                             <br>
-                            <p><em>animedom.com</em> is a the newest anime video network. Over half a thousand anime
-                                series, anime movies, multitude of anime episodes and tons of mirrors to watch from.</p>
+                            <p>
+                                <em>Animedom</em> is a the newest anime video network. Over 3 thousand anime series, anime movies, multitude of anime episodes and tons of mirrors to watch from. We try our best to provide you with the latest dubbed, subbed animes, as well as animes in your preferred language!</p>
                         </div>
                     </div>
                 </div>
@@ -408,33 +517,15 @@ type StructureMirror struct {
                     <div class="module ">
                         <h3 class="module-title">Quick Navigation</h3>
                         <div class="module-content">
-                            <div class="uk-grid">
-                                <div class="uk-width-medium-1-3">
-                                    <i class="pe-7s-coffee pe-4x pe-va"></i>
-                                </div>
-                                <div class="uk-width-medium-2-3">
-                                    <h5>Monday - Friday:</h5>
-                                    <h6 class="uk-text-primary">07:00 - 22:00</h6>
-                                </div>
-                            </div>
-                            <div class="uk-grid">
-                                <div class="uk-width-medium-1-3">
-                                    <i class="pe-7s-wine pe-4x pe-va"></i>
-                                </div>
-                                <div class="uk-width-medium-2-3">
-                                    <h5>Saturday:</h5>
-                                    <h6 class="uk-text-primary">11:00 - 24:00</h6>
-                                </div>
-                            </div>
-                            <div class="uk-grid">
-                                <div class="uk-width-medium-1-3">
-                                    <i class="pe-7s-sun pe-4x pe-va"></i>
-                                </div>
-                                <div class="uk-width-medium-2-3">
-                                    <h5>Sunday:</h5>
-                                    <h6 class="uk-text-primary">Closed</h6>
-                                </div>
-                            </div>
+                            <a href="/"><h5 class="uk-text-primary">Home</h5></a>
+                            <hr>
+                            <a href="/top-rating"><h5 class="uk-text-primary">Top Rating Animes</h5></a>
+                            <hr>
+                            <a href="/latest-episodes"><h5 class="uk-text-primary">Latest Episodes</h5></a>
+                            <hr>
+                            <a href="/ongoing-series"><h5 class="uk-text-primary">On Going Series</h5></a>
+                            <hr>
+                            <a href="/disclaimer"><h5 class="uk-text-primary">Disclaimer</h5></a>
                         </div>
                     </div>
                 </div>
@@ -444,45 +535,17 @@ type StructureMirror struct {
                         <div class="module-content">
                             <div class="uk-grid">
                                 <div class="uk-width-medium-1-2">
-                                    <div class="uk-grid">
-                                        <div class="uk-width-medium-1-4">
-                                            <i class="pe-7s-map-2 pe-4x pe-va"></i>
-                                        </div>
-                                        <div class="uk-width-medium-3-4">
-                                            <h5>Where to find us:</h5>
-                                            <h6 class="uk-text-primary">12 Sunset St.</h6>
-                                        </div>
-                                    </div>
-                                    <div class="uk-grid">
-                                        <div class="uk-width-medium-1-4">
-                                            <i class="pe-7s-call pe-4x pe-va"></i>
-                                        </div>
-                                        <div class="uk-width-medium-3-4">
-                                            <h5>For reservations:</h5>
-                                            <h6 class="uk-text-primary">0700 123 7654</h6>
-                                        </div>
-                                    </div>
-                                    <div class="uk-grid">
-                                        <div class="uk-width-medium-1-4">
-                                            <i class="pe-7s-mail-open-file pe-4x pe-va"></i>
-                                        </div>
-                                        <div class="uk-width-medium-3-4">
-                                            <h5>Email us at:</h5>
-                                            <h6 class="uk-text-primary">pr@clmr.com</h6>
-                                        </div>
-                                    </div>
+                                    <div class="fb-page" data-href="https://www.facebook.com/AnimedomSocial/" data-tabs="timeline" data-height="270" data-small-header="true" data-adapt-container-width="true" data-hide-cover="false" data-show-facepile="true"><div class="fb-xfbml-parse-ignore"><blockquote cite="https://www.facebook.com/AnimedomSocial/"><a href="https://www.facebook.com/AnimedomSocial/">Animedom</a></blockquote></div></div>
                                 </div>
                                 <div class="uk-width-medium-1-2">
-                                    <p>We are taking orders until 14:00 for free delivery. All placed orders after 14:00
-                                        will be delivered with $4 delivery fee.</p>
-                                    <p>Don't hesitate and order now!</p>
+                                    <p>Disclaimer: We don't host any videos on our servers. All images used on the website are available on google under free-to-use-commercially licence and are acquired from myanimelist.net.</p>
+                                    <p>For further reading on our Disclaimer <a href="/disclaimer"><strong>click here</strong></a>.</p>
                                     <hr>
-                                    <h5 class="uk-text-primary">Buy us a Beer!</h5>
+                                    <h5 class="uk-text-primary">Also, <a href="javascript:window.open('https://www.paypal.me/animedom','Terms and Conditions','width=500,height=500')">Buy us some Saki!</a></h5>
                                     <p></p>
-                                    <a class="uk-icon-button uk-icon-facebook" href="#"></a>
-                                    <a class="uk-icon-button uk-icon-twitter" href="#"></a>
-                                    <a class="uk-icon-button uk-icon-youtube" href="#"></a>
-                                    <a class="uk-icon-button uk-icon-linkedin" href="#"></a>
+                                    <a class="uk-icon-button uk-icon-twitter" href="https://twitter.com/AnimedomSocial" target="_blank"></a>
+                                    <a class="uk-icon-button uk-icon-facebook" href="https://www.facebook.com/AnimedomSocial" target="_blank"></a>
+                                    <a class="uk-icon-button uk-icon-google" href="https://plus.google.com/117516327730388259137" target="_blank"></a>
                                 </div>
                             </div>
                         </div>
@@ -512,10 +575,12 @@ type StructureMirror struct {
                 <div class="module-content">
                     <ul class="nav menu">
                         <li class="deeper parent"><a href="/">Home</a></li>
+                        <li><a href="/blogs">News</a></li>
                         <li><a href="/top-rating">Top Rating</a></li>
                         <li><a href="/latest-episodes">Latest Episodes</a></li>
                         <li><a href="/ongoing-series">Ongoing Series</a></li>
-                        <li><a href="/contact">Contact Us</a></li>
+                        <li><a href="/movies">Movies</a></li>
+                        <li><a href="/disclaimer">Disclaimer</a></li>
                     </ul>
                 </div>
             </div>
@@ -523,35 +588,28 @@ type StructureMirror struct {
     </div>
     <!-- /Off Canvas Menu -->
 </div>
-<!-- Scripts placed at the end of the document so the pages load faster -->
-<!-- Jquery scripts -->
-<script src="http://localhost:1234/assets/bower_components/jquery/dist/jquery.js"></script>
-<!-- Uikit scripts -->
-<script src="http://localhost:1234/assets/bower_components/uikit/js/uikit.js"></script>
-<script src="http://localhost:1234/assets/bower_components/uikit/js/components/datepicker.js"></script>
-<script src="http://localhost:1234/assets/bower_components/uikit/js/components/slideshow.js"></script>
-<script src="http://localhost:1234/assets/bower_components/uikit/js/components/slideshow-fx.js"></script>
-<script src="http://localhost:1234/assets/bower_components/uikit/js/components/slideset.js"></script>
-<script src="http://localhost:1234/assets/bower_components/uikit/js/components/sticky.js"></script>
-<script src="http://localhost:1234/assets/bower_components/uikit/js/components/tooltip.js"></script>
-<script src="http://localhost:1234/assets/bower_components/uikit/js/components/parallax.js"></script>
-<script src="http://localhost:1234/assets/bower_components/uikit/js/components/lightbox.js"></script>
-<script src="http://localhost:1234/assets/bower_components/uikit/js/components/grid.min.js"></script>
-<!-- WOW scripts -->
-<script src="http://localhost:1234/assets/bower_components/wow/dist/wow.js"></script>
-<script>
-    new WOW().init();
-</script>
-<!-- Оffcanvas Мenu scripts -->
-<script src="http://localhost:1234/assets/js/offcanvas-menu.js"></script>
-<!-- Template scripts -->
-<script src="http://localhost:1234/assets/js/template.js"></script>
-<!-- Bootstrap requirement for v4 -->
-<script src="http://localhost:1234/assets/bower_components/tether/dist/js/tether.js"></script>
-<!-- Bootstrap core JavaScript -->
-<script src="http://localhost:1234/assets/bower_components/bootstrap/dist/js/bootstrap.js"></script>
-<!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-<script src="http://localhost:1234/assets/js/ie10-viewport-bug-workaround.js"></script>
+
+<!-- ADVERTISEMENT BLOCK -->
+
+<!-- TILLER.COM - START -->
+{% switch p.BaseURL %}
+{% case "http://animedom.to" %}
+    <script data-cfasync="false">(window._1l1uekj||(window._1l1uekj=[])).push({ready:1})</script>
+{% case "http://animedom.net" %}
+    <script data-cfasync="false">(window._6tc4w0||(window._6tc4w0=[])).push({ready:1})</script>
+{% case "http://animedom.com" %}
+    <script data-cfasync="false">(window._1hebtho||(window._1hebtho=[])).push({ready:1})</script>
+{% case "http://animedom.org" %}
+    <script data-cfasync="false">(window._1w0tpqb||(window._1w0tpqb=[])).push({ready:1})</script>
+{% case "http://animedom.tv" %}
+    <script data-cfasync="false">(window._11rujy7||(window._11rujy7=[])).push({ready:1})</script>
+{% endswitch %}
+<!-- TILLER.COM - END -->
+
+<!-- ADVERTISEMENT BLOCK -->
+
 </body>
 </html>
 {% endfunc %}
+{% endstripspace %}
+{% endcollapsespace %}

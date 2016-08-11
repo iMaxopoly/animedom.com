@@ -1,8 +1,8 @@
-package dbModels
+package projectModels
 
 import "encoding/xml"
 
-/* myanimelist.net models */
+// Mal model
 type StructureMALApiAnime struct {
 	Anime   xml.Name               `xml:"anime"`
 	Entries []StructureMALApiEntry `xml:"entry"`
